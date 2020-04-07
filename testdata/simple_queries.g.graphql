@@ -1,0 +1,11 @@
+
+
+"""Query holds the top-level calls that return single responses of data. Call them with the 'query' keyword from your top-level GraphQL document"""
+type Query {
+
+    alpha
+
+
+    common
+
+}
