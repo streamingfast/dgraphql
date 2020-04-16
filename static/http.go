@@ -91,7 +91,7 @@ func serveIndexHTML(router *mux.Router, box *rice.Box, path string, apiKey strin
 			return
 		}
 
-		w.Header().Set("Content-Type", "text/html")
+		w.Header().Set("Content-Type", MIME_TYPE_HTML)
 		io.Copy(w, reader)
 	}))
 }
