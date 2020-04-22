@@ -27,13 +27,12 @@ import (
 	"go.uber.org/zap"
 )
 
-
 var SchemaRegistry = map[string][]byte{}
 
 func RegisterSchema(schemaPrefix, schemaName string, schemaData []byte) {
 	zlog.Debug("registering schema",
 		zap.String("schema_prefix", schemaPrefix),
-	zap.String("schema_name", schemaName),
+		zap.String("schema_name", schemaName),
 	)
 	schemaFullName := schemaPrefix + schemaName
 	if _, found := SchemaRegistry[schemaFullName]; found {
@@ -41,7 +40,6 @@ func RegisterSchema(schemaPrefix, schemaName string, schemaData []byte) {
 	}
 	SchemaRegistry[schemaFullName] = schemaData
 }
-
 
 type schemaID string
 
@@ -67,7 +65,6 @@ type Schemas struct {
 	alphaRawSchema  *string
 }
 
-
 func collectAssetData(isIncluded func(name string) bool) (schemasData [][]byte) {
 	for name, data := range SchemaRegistry {
 		if isIncluded(name) {
@@ -78,9 +75,8 @@ func collectAssetData(isIncluded func(name string) bool) (schemasData [][]byte) 
 }
 
 func NewSchemas(resolver interface{}) (*Schemas, error) {
-
 	commonRawSchema := buildSchemaString("common", collectAssetData(isCommonAssetName))
-	alphaRawSchema := buildSchemaString("alpha", collectAssetData(isCommonAssetName))
+	alphaRawSchema := buildSchemaString("alpha", collectAssetData(isAlphaAssetName))
 
 	if commonRawSchema == nil {
 		panic(fmt.Errorf("it's invalid to have a nil common raw schema"))
@@ -224,7 +220,7 @@ func truncate(in string, start, end int) (truncated string) {
 		panic(fmt.Errorf("end %d should be less than %d", end, len(in)))
 	}
 
-	return in[0:start] + in[end:len(in)]
+	return in[0:start] + in[end:]
 }
 
 func parseSchema(name string, resolver interface{}, rawSchema string) (out *graphql.Schema, err error) {
