@@ -39,7 +39,7 @@ const (
 
 func RegisterStaticRoutes(router *mux.Router, protocol, network, apiKey, jwtIssuerURL string) {
 	zlog.Info("registering static route")
-	box := rice.MustFindBox(".")
+	box := rice.MustFindBox("dgraphql-build")
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/graphiql/", 302)
