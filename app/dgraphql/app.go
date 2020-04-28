@@ -17,6 +17,8 @@ package dgraphql
 import (
 	"context"
 	"fmt"
+	"github.com/dfuse-io/dgraphql/metrics"
+	"github.com/dfuse-io/dmetrics"
 	"net/http"
 	"time"
 
@@ -36,8 +38,8 @@ type Config struct {
 	NetworkID                string
 	OverrideTraceID          bool
 	Protocol                 string
-	JwtIssuerURL string
-	ApiKey               string
+	JwtIssuerURL             string
+	ApiKey                   string
 	Schemas                  *dgraphql.Schemas
 	DataIntegrityProofSecret string
 }
@@ -56,6 +58,8 @@ func New(config *Config) *App {
 
 func (a *App) Run() error {
 	zlog.Info("starting dgraphql eosio", zap.Reflect("config", a.config))
+
+	dmetrics.Register(metrics.MetricSet)
 
 	auth, err := dauth.New(a.config.AuthPlugin)
 	derr.Check("unable to initialize dauth", err)

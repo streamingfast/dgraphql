@@ -18,19 +18,10 @@ import (
 	"github.com/dfuse-io/dmetrics"
 )
 
-var metrics = dmetrics.NewSet()
+var MetricSet = dmetrics.NewSet()
 
-var QueryResponseTimes = metrics.NewHistogram("query_response_times", "query response times histogram for percentile sampling")
-var InflightQueryCount = metrics.NewGauge("inflight_query_count", "inflight query count currently active")
-var InflightSubscriptionCount = metrics.NewGauge("inflight_subscription_count", "inflight subscription count currently active")
-var HeadBlockNumber = metrics.NewHeadBlockNumber("dgraphql")
-var HeadTimeDrift = metrics.NewHeadTimeDrift("dgraphql")
-
-func ServeMetrics() {
-
-	dmetrics.Serve(":9102")
-}
-
-func init() {
-	metrics.Register()
-}
+var QueryResponseTimes = MetricSet.NewHistogram("query_response_times", "query response times histogram for percentile sampling")
+var InflightQueryCount = MetricSet.NewGauge("inflight_query_count", "inflight query count currently active")
+var InflightSubscriptionCount = MetricSet.NewGauge("inflight_subscription_count", "inflight subscription count currently active")
+var HeadBlockNumber = MetricSet.NewHeadBlockNumber("dgraphql")
+var HeadTimeDrift = MetricSet.NewHeadTimeDrift("dgraphql")
