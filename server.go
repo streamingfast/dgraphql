@@ -17,7 +17,6 @@ package dgraphql
 import (
 	"github.com/dfuse-io/dauth"
 	_ "github.com/dfuse-io/dauth/null" // register plugin
-	"github.com/dfuse-io/dgraphql/metrics"
 	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/shutter"
 	"go.uber.org/zap"
@@ -50,8 +49,8 @@ func NewServer(
 	metering dmetering.Metering,
 	schemas *Schemas,
 	dataIntegrityProofSecret string,
-	jwtIssuerURL             string,
-	apiKey                   string,
+	jwtIssuerURL string,
+	apiKey string,
 
 ) *Server {
 	if authenticator == nil {
@@ -68,16 +67,14 @@ func NewServer(
 		metering:                 metering,
 		schemas:                  schemas,
 		DataIntegrityProofSecret: dataIntegrityProofSecret,
-		jwtIssuerURL: jwtIssuerURL,
-		apiKey: apiKey,
+		jwtIssuerURL:             jwtIssuerURL,
+		apiKey:                   apiKey,
 	}
 }
 
 func (s *Server) Launch() {
 	s.startHTTPServer()
 	s.startGRPCServer()
-
-	go metrics.ServeMetrics()
 
 	select {
 	case <-s.Shutter.Terminating():
