@@ -180,7 +180,7 @@ func TestConnect(t *testing.T) {
 	for _, tt := range testTable {
 		t.Run(tt.name, func(t *testing.T) {
 			ws := newConnection()
-			go Connect(ws, tt.svc,
+			go Connect("test", ws, tt.svc,
 				Authentication(nil,
 					func(ctx context.Context, r *http.Request, payload map[string]interface{}) (i context.Context, e error) {
 						return dauth.WithCredentials(ctx, &dauth.AnonymousCredentials{}), nil
