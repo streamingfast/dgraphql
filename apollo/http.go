@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/dfuse-io/dauth"
+	"github.com/dfuse-io/dtracing"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 )
@@ -81,8 +82,10 @@ func (m *Middleware) Handler(next http.Handler) http.Handler {
 					return
 				}
 
+				connectionTraceID := dtracing.GetTraceID(r.Context())
+
 				zlog.Debug("websocket connection initialized correctly, continuing connection process")
-				go Connect(ws, m.service, Authentication(r, m.authenticateFunc))
+				go Connect(connectionTraceID.String(), ws, m.service, Authentication(r, m.authenticateFunc))
 				return
 			}
 		}

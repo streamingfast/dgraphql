@@ -83,6 +83,7 @@ type GraphQLService interface {
 type AuthenticateFunc func(ctx context.Context, r *http.Request, payload map[string]interface{}) (context.Context, error)
 
 type connection struct {
+	logger           *zap.Logger
 	cancel           func()
 	service          GraphQLService
 	writeTimeout     time.Duration
@@ -115,8 +116,9 @@ func WriteTimeout(d time.Duration) func(conn *connection) {
 
 // Connect implements the apollographql subscriptions-transport-ws protocol@v0.9.4
 // https://github.com/apollographql/subscriptions-transport-ws/blob/v0.9.4/PROTOCOL.md
-func Connect(ws wsConnection, service GraphQLService, options ...func(conn *connection)) {
+func Connect(connectionID string, ws wsConnection, service GraphQLService, options ...func(conn *connection)) {
 	conn := &connection{
+		logger:  zlog.With(zap.String("connection_id", connectionID)),
 		service: service,
 		ws:      ws,
 	}
@@ -130,11 +132,11 @@ func Connect(ws wsConnection, service GraphQLService, options ...func(conn *conn
 		opt(conn)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(logging.WithLogger(context.Background(), conn.logger))
 	conn.cancel = cancel
 
 	// This is a blocking call and share the connection lifecycle, so will end only when connection closes
-	zlog.Debug("starting read loop blocking call")
+	conn.logger.Debug("starting read loop blocking call")
 	conn.readLoop(ctx, conn.writeLoop(ctx))
 }
 
@@ -165,7 +167,7 @@ func (conn *connection) writeLoop(ctx context.Context) sendFunc {
 				default:
 				}
 
-				zlog.Debug("setting connection timeout value", zap.Duration("write_timeout", conn.writeTimeout))
+				conn.logger.Debug("setting connection timeout value", zap.Duration("write_timeout", conn.writeTimeout))
 				if err := conn.ws.SetWriteDeadline(time.Now().Add(conn.writeTimeout)); err != nil {
 					return
 				}
@@ -181,7 +183,7 @@ func (conn *connection) writeLoop(ctx context.Context) sendFunc {
 				dmetering.EmitWithCredentials(dmetering.Event{
 					Source:      "dgraphql",
 					Kind:        "GraphQL Subscription",
-					Method:      "",  //TODO For now won't be able to aggregate Ingress / Egress per method
+					Method:      "", //TODO For now won't be able to aggregate Ingress / Egress per method
 					EgressBytes: int64(len(msg.Payload)),
 				}, conn.credentials)
 				//////////////////////////////////////////////////////////////////////
@@ -193,7 +195,7 @@ func (conn *connection) writeLoop(ctx context.Context) sendFunc {
 }
 
 func (conn *connection) close() {
-	zlog.Info("closing websocket connection")
+	conn.logger.Info("closing websocket connection")
 	conn.cancel()
 	conn.ws.Close()
 }
@@ -205,12 +207,14 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 		panic("the connection authenticateFunc must be defined, authentication logic is mandatory!")
 	}
 
-	opDone := map[string]func(){}
+	opDoneByStream := map[string]func(){}
+	opLoggerByStream := map[string]*zap.Logger{}
+
 	for {
 		var msg operationMessage
 		err := conn.ws.ReadJSON(&msg)
 		if err != nil {
-			zlog.Debug("got an error while trying to read message from websocket")
+			conn.logger.Debug("got an error while trying to read message from websocket")
 			return
 		}
 
@@ -258,20 +262,21 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 			dmetering.EmitWithCredentials(dmetering.Event{
 				Source:       "dgraphql",
 				Kind:         "GraphQL Subscription",
-				Method:       "",  //TODO For now won't be able to aggregate Ingress / Egress per method
+				Method:       "", //TODO For now won't be able to aggregate Ingress / Egress per method
 				IngressBytes: int64(len(msg.Payload)),
 			}, conn.credentials)
 			//////////////////////////////////////////////////////////////////////
-
-			zlog.Debug("starting stream due to start message received from client", zap.String("id", msg.ID))
 
 			opCtx, cancel := context.WithCancel(ctx)
 			opCtx = dauth.WithCredentials(opCtx, conn.credentials)
 
 			// We create a brand new span (and trace) per GraphQL subscription
 			opCtx, span := dtracing.StartFreshSpan(opCtx, "stream/"+osp.OperationName)
-			opCtx = logging.WithLogger(opCtx, zlog.With(zap.Stringer("trace_id", span.SpanContext().TraceID)))
+			opLogger := conn.logger.With(zap.String("stream_id", msg.ID), zap.Stringer("trace_id", span.SpanContext().TraceID))
 
+			opCtx = logging.WithLogger(opCtx, opLogger)
+
+			opLogger.Debug("starting stream due to start message received from client")
 			analytics.TrackSubscriptionStart(opCtx, "apollo")
 
 			c, err := conn.service.Subscribe(opCtx, osp.Query, osp.OperationName, osp.Variables)
@@ -281,7 +286,8 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 				continue
 			}
 
-			opDone[msg.ID] = cancel
+			opDoneByStream[msg.ID] = cancel
+			opLoggerByStream[msg.ID] = opLogger
 
 			go func() {
 				defer cancel()
@@ -294,7 +300,7 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 					case payload, more := <-c:
 						if !more {
 							analytics.TrackSubscriptionComplete(opCtx, "apollo")
-							zlog.Info("notifying completion of stream due to no more data", zap.String("id", msg.ID))
+							opLogger.Info("notifying completion of stream due to no more data")
 							send(msg.ID, typeComplete, nil)
 							return
 						}
@@ -304,7 +310,7 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 							terminalErr := getTerminalQueryError(resp.Errors)
 							if terminalErr != nil {
 								var err = resp.Errors[0]
-								zlog.Info("notifying completion of stream due to service error", zap.String("id", msg.ID), zap.Error(err))
+								opLogger.Info("notifying completion of stream due to service error", zap.Error(err))
 								analytics.TrackSubscriptionError(opCtx, "apollo", err)
 								send(msg.ID, typeError, errPayload(err))
 								return
@@ -327,18 +333,22 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 			// We simply discard pong messages as they act as keep alive messages
 
 		case typeStop:
-			zlog.Debug("stopping stream due to stop message received from client", zap.String("id", msg.ID))
-			onDone, ok := opDone[msg.ID]
+			conn.logger.Debug("received stop message from client", zap.String("id", msg.ID))
+			onDone, ok := opDoneByStream[msg.ID]
 			if ok {
-				delete(opDone, msg.ID)
+				opLoggerByStream[msg.ID].Info("stopping stream due to stop message received from client")
+
+				delete(opDoneByStream, msg.ID)
+				delete(opLoggerByStream, msg.ID)
+
 				onDone()
 			}
 
 		case typeConnectionTerminate:
-			zlog.Info("terminating client connection")
+			conn.logger.Info("terminating client connection")
 			err := conn.ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
-				zlog.Warn("unable to send close message to client, discarding")
+				conn.logger.Warn("unable to send close message to client, discarding")
 				return
 			}
 
