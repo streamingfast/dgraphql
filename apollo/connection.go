@@ -281,6 +281,7 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 
 			c, err := conn.service.Subscribe(opCtx, osp.Query, osp.OperationName, osp.Variables)
 			if err != nil {
+				opLogger.Info("notifying completion of stream due to subscribe error")
 				cancel()
 				send(msg.ID, typeError, errPayload(err))
 				continue
@@ -306,19 +307,22 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 						}
 
 						if resp, ok := payload.(*graphql.Response); ok {
-							// We assume there will be a single error, we should handle the multi-error variant one day...
+							// We always log the terminal error here, which is only one of the `resp.Errors` values. This
+							// isn't the best way since we only report one out of potentially N errors. We should at some
+							// support sending back multiple errors directly in the stream output instead of one. At least
+							// for now, we also log the original `resp.Errors` so that should help debugging.
 							terminalErr := getTerminalQueryError(resp.Errors)
 							if terminalErr != nil {
-								var err = resp.Errors[0]
-								opLogger.Info("notifying completion of stream due to service error", zap.Error(err))
-								analytics.TrackSubscriptionError(opCtx, "apollo", err)
-								send(msg.ID, typeError, errPayload(err))
+								opLogger.Info("notifying completion of stream due to service error", zap.Error(terminalErr), zap.Reflect("all_errors", resp.Errors))
+								analytics.TrackSubscriptionError(opCtx, "apollo", terminalErr)
+								send(msg.ID, typeError, errPayload(terminalErr))
 								return
 							}
 						}
 
 						jsonPayload, err := json.Marshal(payload)
 						if err != nil {
+							opLogger.Info("notifying completion of stream since we were unable to JSON marshal payload", zap.Error(err))
 							analytics.TrackSubscriptionError(opCtx, "apollo", err)
 							send(msg.ID, typeError, errPayload(err))
 							return
@@ -377,6 +381,34 @@ func getTerminalQueryError(responseErrors []*gqerrors.QueryError) error {
 	}
 
 	for _, err := range responseErrors {
+		// This is a special case for context deadline exceed that can happen within `graphql-go`
+		// library directly. In the library, there is a maximal time for of subscription execution to
+		// happen. We customize this to 10 seconds in `schema.go#parseSchema` but it still can
+		// happen under abnormal network condition that the timeout kicks in.
+		//
+		// When the timeout happen through the `context.Err()`, the error is then wrapped manually
+		// in a `gqerrors.QueryError` struct and the `context.Err()` string is put straight as-is
+		// in the `Message` field. We need to forward that as a `terminal` error otherwise the client
+		// will not re-connect automatically.
+		//
+		// However, to make things harder, the context that has the timeout value is not under our control
+		// so we cannot use our subscription context and check for its `Err()` value. So we need to check the
+		// actual error message value manually.
+		//
+		// Hackylish, if the message in the error is `context.DeadlineExceeded.Error()`, we return a custom
+		// `gqerrors.QueryError` back as a terminal error.
+		//
+		// @see https://github.com/graph-gophers/graphql-go/blob/dae41bde9ef91c12e78863f0299348612f2d6214/internal/exec/subscribe.go#L115 (Subscription timeout context)
+		// @see https://github.com/graph-gophers/graphql-go/blob/dae41bde9ef91c12e78863f0299348612f2d6214/internal/exec/subscribe.go#L65 (Subscription context error wrapping)
+		if err.Message == context.DeadlineExceeded.Error() {
+			return &gqerrors.QueryError{
+				Message: "unable to complete operation within deadline",
+				Extensions: map[string]interface{}{
+					"terminal": true,
+				},
+			}
+		}
+
 		if err.Extensions == nil {
 			continue
 		}
