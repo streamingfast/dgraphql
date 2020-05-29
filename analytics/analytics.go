@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dfuse-io/dauth"
+	"github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/logging"
 
 	"go.uber.org/zap"
@@ -50,7 +50,7 @@ func TrackUserEvent(ctx context.Context, moduleName, eventName string, keyvals .
 		}
 	}
 
-	creds := dauth.GetCredentials(ctx)
+	creds := authenticator.GetCredentials(ctx)
 	fields = append(fields, creds.GetLogFields()...)
 
 	zlogger.Info(moduleName+"_"+eventName, fields...)
@@ -70,7 +70,7 @@ func toString(input interface{}) string {
 func TrackSubscriptionStart(ctx context.Context, protocol string) {
 	zlogger := logging.Logger(ctx, zlog)
 	zlogger.Info("subscription_start",
-		append(dauth.GetCredentials(ctx).GetLogFields(),
+		append(authenticator.GetCredentials(ctx).GetLogFields(),
 			zap.String("module_name", "dgraphql"),
 			zap.String("protocol", protocol))...)
 }
@@ -78,7 +78,7 @@ func TrackSubscriptionStart(ctx context.Context, protocol string) {
 func TrackSubscriptionComplete(ctx context.Context, protocol string) {
 	zlogger := logging.Logger(ctx, zlog)
 	zlogger.Info("subscription_complete",
-		append(dauth.GetCredentials(ctx).GetLogFields(),
+		append(authenticator.GetCredentials(ctx).GetLogFields(),
 			zap.String("module_name", "dgraphql"),
 			zap.String("protocol", protocol),
 			zap.String("execution_status", "ok"))...)
@@ -87,7 +87,7 @@ func TrackSubscriptionComplete(ctx context.Context, protocol string) {
 func TrackSubscriptionContextDone(ctx context.Context, protocol string) {
 	zlogger := logging.Logger(ctx, zlog)
 	zlogger.Info("subscription_context_done",
-		append(dauth.GetCredentials(ctx).GetLogFields(),
+		append(authenticator.GetCredentials(ctx).GetLogFields(),
 			zap.String("module_name", "dgraphql"),
 			zap.String("protocol", protocol),
 			zap.String("execution_status", "connection_lost"))...)
@@ -96,7 +96,7 @@ func TrackSubscriptionContextDone(ctx context.Context, protocol string) {
 func TrackSubscriptionError(ctx context.Context, protocol string, err error) {
 	zlogger := logging.Logger(ctx, zlog)
 	zlogger.Info("subscription_error",
-		append(dauth.GetCredentials(ctx).GetLogFields(),
+		append(authenticator.GetCredentials(ctx).GetLogFields(),
 			zap.String("module_name", "dgraphql"),
 			zap.String("protocol", protocol),
 			zap.String("execution_status", "err"),

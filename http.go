@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"strings"
 
-	dauthMiddleware "github.com/dfuse-io/dauth/middleware"
+	dauthMiddleware "github.com/dfuse-io/dauth/authenticator/middleware"
 	"github.com/dfuse-io/dmetering"
 
 	"github.com/dfuse-io/derr"

@@ -17,15 +17,15 @@ package dgraphql
 import (
 	"context"
 	"fmt"
-	"github.com/dfuse-io/dgraphql/metrics"
-	"github.com/dfuse-io/dmetrics"
 	"net/http"
 	"time"
 
-	"github.com/dfuse-io/dauth"
+	dauthAuthenticator "github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/derr"
 	"github.com/dfuse-io/dgraphql"
+	"github.com/dfuse-io/dgraphql/metrics"
 	"github.com/dfuse-io/dmetering"
+	"github.com/dfuse-io/dmetrics"
 	"github.com/dfuse-io/shutter"
 	"go.uber.org/zap"
 )
@@ -61,7 +61,7 @@ func (a *App) Run() error {
 
 	dmetrics.Register(metrics.MetricSet)
 
-	auth, err := dauth.New(a.config.AuthPlugin)
+	auth, err := dauthAuthenticator.New(a.config.AuthPlugin)
 	derr.Check("unable to initialize dauth", err)
 
 	meter, err := dmetering.New(a.config.MeteringPlugin)

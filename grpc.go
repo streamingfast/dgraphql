@@ -23,7 +23,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dfuse-io/dauth"
+	"github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/dgraphql/analytics"
 	"github.com/dfuse-io/dgraphql/insecure"
 	"github.com/dfuse-io/dgrpc"
@@ -100,7 +100,7 @@ func (s *Server) startGRPCServerInsecure() {
 	}()
 }
 
-func newGRPCServer(schema *graphql.Schema, authenticator dauth.Authenticator, overrideTraceID bool) *grpc.Server {
+func newGRPCServer(schema *graphql.Schema, authenticator authenticator.Authenticator, overrideTraceID bool) *grpc.Server {
 	serverOptions := []dgrpc.ServerOption{dgrpc.WithLogger(zlog)}
 	if overrideTraceID {
 		serverOptions = append(serverOptions, dgrpc.OverrideTraceID())
@@ -115,10 +115,10 @@ func newGRPCServer(schema *graphql.Schema, authenticator dauth.Authenticator, ov
 
 type EndpointServer struct {
 	schema        *graphql.Schema
-	authenticator dauth.Authenticator
+	authenticator authenticator.Authenticator
 }
 
-func NewEndpointServer(schema *graphql.Schema, authenticator dauth.Authenticator) *EndpointServer {
+func NewEndpointServer(schema *graphql.Schema, authenticator authenticator.Authenticator) *EndpointServer {
 	return &EndpointServer{
 		schema:        schema,
 		authenticator: authenticator,
@@ -154,7 +154,7 @@ func (s *EndpointServer) Execute(req *pbgraphql.Request, stream pbgraphql.GraphQ
 
 	mdIn, _ := metadata.FromIncomingContext(ctx)
 	xff := mdIn.Get("x-forwarded-for")
-	ip := dauth.RealIP(strings.Join(xff, ", "))
+	ip := authenticator.RealIP(strings.Join(xff, ", "))
 
 	var e error
 	ctx, e = s.authenticator.Check(ctx, token, ip)

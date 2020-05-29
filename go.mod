@@ -6,11 +6,11 @@ require (
 	cloud.google.com/go v0.51.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.6
 	github.com/GeertJohan/go.rice v1.0.0
-	github.com/dfuse-io/dauth v0.0.0-20200407002455-d8256e743286
-	github.com/dfuse-io/derr v0.0.0-20200406214256-c690655246a1
-	github.com/dfuse-io/dgrpc v0.0.0-20200406214416-6271093e544c
+	github.com/dfuse-io/dauth v0.0.0-20200529152628-18790f0c0b3c
+	github.com/dfuse-io/derr v0.0.0-20200417132224-d333cfd0e9a0
+	github.com/dfuse-io/dgrpc v0.0.0-20200417124327-c8f215bc4ce5
 	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
-	github.com/dfuse-io/dmetering v0.0.0-20200407002734-b1d962316f28
+	github.com/dfuse-io/dmetering v0.0.0-20200529152951-0c90b6c54930
 	github.com/dfuse-io/dmetrics v0.0.0-20200406214800-499fc7b320ab
 	github.com/dfuse-io/dtracing v0.0.0-20200406213603-4b0c0063b125
 	github.com/dfuse-io/jsonpb v0.0.0-20200406211248-c5cf83f0e0c0
@@ -28,11 +28,11 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.6.0
 	go.uber.org/multierr v1.5.0 // indirect
-	go.uber.org/zap v1.14.0
+	go.uber.org/zap v1.14.1
 	golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect

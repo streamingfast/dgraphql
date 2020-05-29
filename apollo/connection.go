@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dfuse-io/dauth"
+	"github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/dgraphql/analytics"
 	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/dtracing"
@@ -88,7 +88,7 @@ type connection struct {
 	service          GraphQLService
 	writeTimeout     time.Duration
 	ws               wsConnection
-	credentials      dauth.Credentials
+	credentials      authenticator.Credentials
 	authenticateFunc AuthenticateFunc
 	request          *http.Request
 }
@@ -232,7 +232,7 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 				continue
 			}
 
-			conn.credentials = dauth.GetCredentials(ctx)
+			conn.credentials = authenticator.GetCredentials(ctx)
 			send("", typeConnectionAck, nil)
 
 		case typeStart:
@@ -268,7 +268,7 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 			//////////////////////////////////////////////////////////////////////
 
 			opCtx, cancel := context.WithCancel(ctx)
-			opCtx = dauth.WithCredentials(opCtx, conn.credentials)
+			opCtx = authenticator.WithCredentials(opCtx, conn.credentials)
 
 			// We create a brand new span (and trace) per GraphQL subscription
 			opCtx, span := dtracing.StartFreshSpan(opCtx, "stream/"+osp.OperationName)

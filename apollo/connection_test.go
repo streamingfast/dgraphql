@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dfuse-io/dauth"
+	"github.com/dfuse-io/dauth/authenticator"
 )
 
 type messageIntention int
@@ -183,7 +183,7 @@ func TestConnect(t *testing.T) {
 			go Connect("test", ws, tt.svc,
 				Authentication(nil,
 					func(ctx context.Context, r *http.Request, payload map[string]interface{}) (i context.Context, e error) {
-						return dauth.WithCredentials(ctx, &dauth.AnonymousCredentials{}), nil
+						return authenticator.WithCredentials(ctx, &authenticator.AnonymousCredentials{}), nil
 					},
 				),
 				FakeCredential(),
@@ -195,7 +195,7 @@ func TestConnect(t *testing.T) {
 
 func FakeCredential() func(conn *connection) {
 	return func(conn *connection) {
-		conn.credentials = &dauth.AnonymousCredentials{}
+		conn.credentials = &authenticator.AnonymousCredentials{}
 	}
 }
 

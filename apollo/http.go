@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dfuse-io/dauth"
+	"github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/dtracing"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -46,7 +46,7 @@ func NewMiddleware(service GraphQLService, authenticate func(context.Context, st
 				if tokenString, ok := tokenObject.(string); ok {
 					tokenString := strings.TrimPrefix(tokenString, "Bearer ")
 
-					ip := dauth.RealIPFromRequest(r)
+					ip := authenticator.RealIPFromRequest(r)
 					ctx, err := authenticate(ctx, tokenString, ip)
 					if err != nil {
 						return nil, err

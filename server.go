@@ -15,8 +15,9 @@
 package dgraphql
 
 import (
-	"github.com/dfuse-io/dauth"
-	_ "github.com/dfuse-io/dauth/null" // register plugin
+	"github.com/dfuse-io/dauth/authenticator"
+	dauthAuthenticator "github.com/dfuse-io/dauth/authenticator"
+	_ "github.com/dfuse-io/dauth/authenticator/null" // register plugin
 	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/shutter"
 	"go.uber.org/zap"
@@ -30,7 +31,7 @@ type Server struct {
 	protocol        string
 	networkID       string
 	overrideTraceID bool
-	authenticator   dauth.Authenticator
+	authenticator   authenticator.Authenticator
 	metering        dmetering.Metering
 	schemas         *Schemas
 
@@ -45,7 +46,7 @@ func NewServer(
 	protocol string,
 	networkID string,
 	overrideTraceID bool,
-	authenticator dauth.Authenticator,
+	authenticator authenticator.Authenticator,
 	metering dmetering.Metering,
 	schemas *Schemas,
 	dataIntegrityProofSecret string,
@@ -54,7 +55,7 @@ func NewServer(
 
 ) *Server {
 	if authenticator == nil {
-		authenticator, _ = dauth.New("null://")
+		authenticator, _ = dauthAuthenticator.New("null://")
 	}
 	return &Server{
 		Shutter:                  shutter.New(),
