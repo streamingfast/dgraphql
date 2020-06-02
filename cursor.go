@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/dfuse-io/opaque"
-	"github.com/gogo/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 )
 
 func MustProtoToOpaqueCursor(entity proto.Message, entityTag string) string {
