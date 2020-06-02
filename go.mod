@@ -19,7 +19,6 @@ require (
 	github.com/dfuse-io/opaque v0.0.0-20200407012705-75c4ca372d71
 	github.com/dfuse-io/pbgo v0.0.6-0.20200407175820-b82ffcb63bf6
 	github.com/dfuse-io/shutter v1.4.1-0.20200407040739-f908f9ab727f
-	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.5
 	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/gorilla/handlers v1.4.2

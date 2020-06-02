@@ -19,7 +19,7 @@ import (
 
 	"github.com/dfuse-io/dgraphql/types"
 	pbgraphql "github.com/dfuse-io/pbgo/dfuse/graphql/v1"
-	"github.com/gogo/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

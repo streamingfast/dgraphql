@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/dfuse-io/dgraphql/types"
-	"github.com/gogo/protobuf/proto"
+	"github.com/golang/protobuf/proto"
 )
 
 type Paginator struct {
