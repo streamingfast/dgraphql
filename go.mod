@@ -17,7 +17,7 @@ require (
 	github.com/dfuse-io/jsonpb v0.0.0-20200406211248-c5cf83f0e0c0
 	github.com/dfuse-io/logging v0.0.0-20200407175011-14021b7a79af
 	github.com/dfuse-io/opaque v0.0.0-20200407012705-75c4ca372d71
-	github.com/dfuse-io/pbgo v0.0.6-0.20200407175820-b82ffcb63bf6
+	github.com/dfuse-io/pbgo v0.0.6-0.20200602163822-677d66ead419
 	github.com/dfuse-io/shutter v1.4.1-0.20200407040739-f908f9ab727f
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/handlers v1.4.2
