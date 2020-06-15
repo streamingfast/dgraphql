@@ -15,6 +15,7 @@
 package types
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 )
@@ -123,4 +124,181 @@ func (u *Uint32) UnmarshalGraphQL(input interface{}) error {
 
 func (u Uint32) MarshalJSON() ([]byte, error) {
 	return []byte(strconv.FormatUint(uint64(u.Native()), 10)), nil
+}
+
+///
+/// Int64
+///
+
+type Int64 int64
+
+func ToInt64(rawJSON string) Int64 {
+	var res Int64
+	_ = res.UnmarshalJSON([]byte(rawJSON))
+	return res
+}
+
+func (u Int64) ImplementsGraphQLType(name string) bool {
+	return name == "Int64"
+}
+
+func (u *Int64) Native() int64 {
+	if u == nil {
+		return 0
+	}
+	return int64(*u)
+}
+
+func (u *Int64) UnmarshalGraphQL(input interface{}) error {
+	var err error
+	switch input := input.(type) {
+	case string:
+		res, err2 := strconv.ParseInt(input, 10, 64)
+		if err2 != nil {
+			err = err2
+			break
+		}
+		*u = Int64(res)
+	case float64:
+		// FIXME: do bound checks, ensure it fits within the Int64
+		// boundaries before truncating silently.
+		*u = Int64(input)
+	case float32:
+		*u = Int64(input)
+	case int64:
+		*u = Int64(input)
+	case uint64:
+		*u = Int64(input)
+	case uint32:
+		*u = Int64(input)
+	case int32:
+		*u = Int64(input)
+	default:
+		err = errors.New("wrong type")
+	}
+	return err
+}
+
+func (u Int64) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + strconv.FormatInt(u.Native(), 10) + `"`), nil
+}
+
+func (i *Int64) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return errors.New("empty value")
+	}
+
+	if data[0] == '"' {
+		var s string
+		if err := json.Unmarshal(data, &s); err != nil {
+			return err
+		}
+
+		val, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			return err
+		}
+
+		*i = Int64(val)
+
+		return nil
+	}
+
+	var v int64
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	*i = Int64(v)
+
+	return nil
+}
+
+///
+/// Uint64
+///
+
+type Uint64 uint64
+
+// ToUint64 does JSON decoding of an uint64, and returns a Uint64 from this package.
+func ToUint64(rawJSON string) Uint64 {
+	var res Uint64
+	_ = res.UnmarshalJSON([]byte(rawJSON))
+	return res
+}
+
+func (u Uint64) ImplementsGraphQLType(name string) bool {
+	return name == "Uint64"
+}
+
+func (u *Uint64) Native() uint64 {
+	if u == nil {
+		return 0
+	}
+	return uint64(*u)
+}
+
+func (u *Uint64) UnmarshalGraphQL(input interface{}) error {
+	var err error
+	switch input := input.(type) {
+	case string:
+		res, err2 := strconv.ParseUint(input, 10, 64)
+		if err2 != nil {
+			err = err2
+			break
+		}
+		*u = Uint64(res)
+	case float64:
+		// FIXME: do bound checks, ensure it fits within the Uint64
+		// boundaries before truncating silently.
+		*u = Uint64(input)
+	case float32:
+		*u = Uint64(input)
+	case int64:
+		*u = Uint64(input)
+	case uint64:
+		*u = Uint64(input)
+	case uint32:
+		*u = Uint64(input)
+	case int32:
+		*u = Uint64(input)
+	default:
+		err = errors.New("wrong type")
+	}
+	return err
+}
+
+func (u Uint64) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + strconv.FormatUint(u.Native(), 10) + `"`), nil
+}
+
+func (i *Uint64) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return errors.New("empty value")
+	}
+
+	if data[0] == '"' {
+		var s string
+		if err := json.Unmarshal(data, &s); err != nil {
+			return err
+		}
+
+		val, err := strconv.ParseUint(s, 10, 64)
+		if err != nil {
+			return err
+		}
+
+		*i = Uint64(val)
+
+		return nil
+	}
+
+	var v uint64
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	*i = Uint64(v)
+
+	return nil
 }
