@@ -67,6 +67,12 @@ func (s *Server) startGRPCServer() {
 		return
 	}
 
+	errorLogger, err := zap.NewStdLogAt(zlog, zap.ErrorLevel)
+	if err != nil {
+		s.Shutter.Shutdown(fmt.Errorf("unable to create error logger: %w", err))
+		return
+	}
+
 	grpcServer := http.Server{
 		Handler: grpcRouter,
 		TLSConfig: &tls.Config{
@@ -74,6 +80,7 @@ func (s *Server) startGRPCServer() {
 			ClientCAs:    insecure.CertPool,
 			ClientAuth:   tls.VerifyClientCertIfGiven,
 		},
+		ErrorLog: errorLogger,
 	}
 
 	go func() {

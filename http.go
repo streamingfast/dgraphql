@@ -85,12 +85,18 @@ func (s *Server) startHTTPServer() {
 	if err != nil {
 		s.Shutter.Shutdown(fmt.Errorf("failed listening http %q: %w", s.httpListenAddr, err))
 		return
+	}
 
+	errorLogger, err := zap.NewStdLogAt(zlog, zap.ErrorLevel)
+	if err != nil {
+		s.Shutter.Shutdown(fmt.Errorf("unable to create error logger: %w", err))
+		return
 	}
 
 	corsMiddleware := NewCORSMiddleware()
 	httpServer := http.Server{
-		Handler: handlers.CompressHandlerLevel(corsMiddleware(router), gzip.BestSpeed),
+		Handler:  handlers.CompressHandlerLevel(corsMiddleware(router), gzip.BestSpeed),
+		ErrorLog: errorLogger,
 	}
 
 	go func() {
