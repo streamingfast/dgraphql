@@ -40,19 +40,23 @@ type Config struct {
 	Protocol                 string
 	JwtIssuerURL             string
 	ApiKey                   string
-	Schemas                  *dgraphql.Schemas
 	DataIntegrityProofSecret string
+}
+type SchemaFactory interface {
+	Schemas() (*dgraphql.Schemas, error)
 }
 
 type App struct {
 	*shutter.Shutter
-	config *Config
+	config        *Config
+	schemaFactory SchemaFactory
 }
 
-func New(config *Config) *App {
+func New(config *Config, schemaFactory SchemaFactory) *App {
 	return &App{
-		Shutter: shutter.New(),
-		config:  config,
+		Shutter:       shutter.New(),
+		config:        config,
+		schemaFactory: schemaFactory,
 	}
 }
 
@@ -68,6 +72,11 @@ func (a *App) Run() error {
 	derr.Check("unable to initialize dmetering", err)
 	dmetering.SetDefaultMeter(meter)
 
+	schemas, err := a.schemaFactory.Schemas()
+	if err != nil {
+		return err
+	}
+
 	zlog.Info("starting dgraphql server")
 	server := dgraphql.NewServer(
 		a.config.GRPCListenAddr,
@@ -77,7 +86,7 @@ func (a *App) Run() error {
 		a.config.OverrideTraceID,
 		auth,
 		meter,
-		a.config.Schemas,
+		schemas,
 		a.config.DataIntegrityProofSecret,
 		a.config.JwtIssuerURL,
 		a.config.ApiKey,
