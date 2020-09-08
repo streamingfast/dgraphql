@@ -37,7 +37,13 @@ const (
 	MIME_TYPE_JSON = "application/json"
 )
 
-func RegisterStaticRoutes(router *mux.Router, protocol, network, apiKey, jwtIssuerURL string) {
+// RegisterStaticRoutes registers all GraphiQL static route enabling traffic of `/graphiql` paths.
+// The `predfinedGraphqlExamples` are used to prefill the GraphQL history for the specified protocol
+// and network.
+//
+// The `jwtIssuerURL` is used to configure the `client-js` library so we are able to easily fetch
+// authentication tokens.
+func RegisterStaticRoutes(router *mux.Router, protocol, network, apiKey, jwtIssuerURL string, predfinedGraphqlExamples []*GraphqlExample) error {
 	zlog.Info("registering static route")
 	box := rice.MustFindBox("dgraphql-build")
 
@@ -52,9 +58,14 @@ func RegisterStaticRoutes(router *mux.Router, protocol, network, apiKey, jwtIssu
 	serveIndexHTML(router, box, "/graphiql/", apiKey, jwtIssuerURL)
 	serveFileAsset(router, box, "/graphiql/graphiql_dfuse_override.css", "graphiql_dfuse_override.css", MIME_TYPE_CSS)
 	serveFileAsset(router, box, "/graphiql/helper.js", "helper.js", MIME_TYPE_JS)
-	serveFileAsset(router, box, "/graphiql/favorites.json", "favorites.json", MIME_TYPE_JSON)
 
-	configJSON := fmt.Sprintf(`{"protocol":"%s","network":"%s"}`, protocol, network)
+	graphqlExamplesJSON, err := json.Marshal(predfinedGraphqlExamples)
+	if err != nil {
+		return fmt.Errorf("marshal graphql examples: %w", err)
+	}
+	serveInMemoryAsset(router, "/graphiql/predefined_examples.json", graphqlExamplesJSON, MIME_TYPE_JSON)
+
+	configJSON := []byte(fmt.Sprintf(`{"protocol":"%s","network":"%s"}`, protocol, network))
 	serveInMemoryAsset(router, "/graphiql/config.json", configJSON, MIME_TYPE_JSON)
 
 	// Redirects since it was supported at some point, redirects everyone to `GraphiQL` instead
@@ -65,23 +76,25 @@ func RegisterStaticRoutes(router *mux.Router, protocol, network, apiKey, jwtIssu
 	router.HandleFunc("/playground/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/graphiql/", 302)
 	})
+
+	return nil
 }
 
-func serveInMemoryAsset(router *mux.Router, path string, content string, contentType string) {
-	router.HandleFunc(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func serveInMemoryAsset(router *mux.Router, path string, content []byte, contentType string) {
+	router.HandleFunc(path, http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", contentType)
-		w.Write([]byte(content))
+		w.Write(content)
 	}))
 }
 
 func serveIndexHTML(router *mux.Router, box *rice.Box, path string, apiKey string, jwtIssuerURL string) {
 	zlog.Info("setting up index http handler")
-	router.HandleFunc(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc(path, http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		zlog.Info("serving index",
-			zap.String("path",path),
-			zap.String("jwt_issuer_url",jwtIssuerURL),
-			zap.String("api_key",apiKey),
-			zap.String("file_to_template",IndexFilename),
+			zap.String("path", path),
+			zap.String("jwt_issuer_url", jwtIssuerURL),
+			zap.String("api_key", apiKey),
+			zap.String("file_to_template", IndexFilename),
 		)
 		reader, err := templatedIndex(box, apiKey, jwtIssuerURL)
 		if err != nil {
@@ -97,7 +110,7 @@ func serveIndexHTML(router *mux.Router, box *rice.Box, path string, apiKey strin
 }
 
 func serveFileAsset(router *mux.Router, box *rice.Box, path string, asset string, contentType string, options ...interface{}) {
-	router.HandleFunc(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc(path, http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		reader, err := box.Open(asset)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -113,7 +126,7 @@ func serveFileAsset(router *mux.Router, box *rice.Box, path string, asset string
 	}))
 }
 
-func  templatedIndex(box *rice.Box, apiKey string, jwtIssuerURL string) (*bytes.Reader, error) {
+func templatedIndex(box *rice.Box, apiKey string, jwtIssuerURL string) (*bytes.Reader, error) {
 	zlog.Info("rendering templated index")
 	indexContent, err := box.Bytes(IndexFilename)
 	if err != nil {

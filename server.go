@@ -18,6 +18,7 @@ import (
 	"github.com/dfuse-io/dauth/authenticator"
 	dauthAuthenticator "github.com/dfuse-io/dauth/authenticator"
 	_ "github.com/dfuse-io/dauth/authenticator/null" // register plugin
+	"github.com/dfuse-io/dgraphql/static"
 	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/shutter"
 	"go.uber.org/zap"
@@ -38,6 +39,7 @@ type Server struct {
 	DataIntegrityProofSecret string
 	jwtIssuerURL             string
 	apiKey                   string
+	predfinedGraphqlExamples []*static.GraphqlExample
 }
 
 func NewServer(
@@ -52,6 +54,7 @@ func NewServer(
 	dataIntegrityProofSecret string,
 	jwtIssuerURL string,
 	apiKey string,
+	predfinedGraphqlExamples []*static.GraphqlExample,
 
 ) *Server {
 	if authenticator == nil {
@@ -70,6 +73,7 @@ func NewServer(
 		DataIntegrityProofSecret: dataIntegrityProofSecret,
 		jwtIssuerURL:             jwtIssuerURL,
 		apiKey:                   apiKey,
+		predfinedGraphqlExamples: predfinedGraphqlExamples,
 	}
 }
 

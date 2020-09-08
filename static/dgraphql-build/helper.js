@@ -142,24 +142,19 @@ function pushState(url, query, variables) {
 }
 
 async function getConfig() {
-    if (window.location.hostname === "localhost") {
-        return await fetchConfig()
-    }
-
-    const parts = window.location.host.split(".");
-    return { network: parts[0], protocol: parts[1] }
+    return await fetchConfig()
 }
 
-function fetchFavorites() {
-    console.info("Fetching favorites JSON data")
-    return fetch("/graphiql/favorites.json")
+function fetchPredefinedExamples() {
+    console.info("Fetching predefined GraphQL examples JSON data")
+    return fetch("/graphiql/predefined_examples.json")
             .then((response) => response.json())
             .then((body) => {
-                console.log("Got favorites JSON data")
+                console.log("Got predefined GraphQL examples JSON data")
                 return body
             })
             .catch((error) => {
-                console.log("Fetch favorites JSON data error", error);
+                console.log("Fetch predefined GraphQL examples error", error);
                 return {}
             })
 }
@@ -202,29 +197,22 @@ async function reconfigureGraphiQLStorage(protocol, network, alphaSchema) {
         localStorage.setItem("graphiql:historyPaneOpen", toJSON(true));
     }
 
-    const serverFavorites = await setFavorites(protocol, network, alphaSchema)
+    const predefinedExamples = await setPredefinedExamples(protocol, network, alphaSchema)
 
     localStorage.setItem("dfuse:graphiql:is_first_time", toJSON(false))
 
-    if (isFirstTime == null && serverFavorites.length > 0) {
-        localStorage.setItem("graphiql:query", serverFavorites[0].query);
+    if (isFirstTime == null && predefinedExamples.length > 0) {
+        localStorage.setItem("graphiql:query", predefinedExamples[0].query);
 
-        if (serverFavorites[0].variables) {
-            localStorage.setItem("graphiql:variables", serverFavorites[0].variables);
+        if (predefinedExamples[0].variables) {
+            localStorage.setItem("graphiql:variables", predefinedExamples[0].variables);
         }
     }
 }
 
-async function setFavorites(protocol, network, alphaSchema) {
-    const favoritesByProtocolMap = await fetchFavorites()
-
+async function setPredefinedExamples(protocol, network, alphaSchema) {
     console.log(`Looking for favorites for given ${protocol}/${network} values`)
-    const serverFavorites = favoritesByProtocolMap[protocol]
-    if (serverFavorites == null) {
-        console.log("Favorites not found for this protocol/network values.")
-        return
-    }
-
+    const predefinedExamples = await fetchPredefinedExamples()
     const store = getFavoriteFromStorage()
 
     // Clear all dfuse managed favorites, we will add them back
@@ -234,7 +222,7 @@ async function setFavorites(protocol, network, alphaSchema) {
     )
 
     console.log("Favorites store prior update")
-    serverFavorites.reverse().forEach((favorite) => {
+    predefinedExamples.reverse().forEach((favorite) => {
         if (!alphaSchema && favorite.alpha) {
             return
         }
@@ -244,7 +232,12 @@ async function setFavorites(protocol, network, alphaSchema) {
         if (favorite.variables && typeof favorite.variables === "object") {
             const networkVariables = favorite.variables[network]
             if (networkVariables != null) {
-                favorite.variables = networkVariables
+                favorite.variables = JSON.stringify(networkVariables, null, "  ")
+            } else {
+                const genericNetworkVariables = favorite.variables["generic"]
+                if (genericNetworkVariables != null) {
+                    favorite.variables = JSON.stringify(genericNetworkVariables, null, "  ")
+                }
             }
         }
 
@@ -255,7 +248,7 @@ async function setFavorites(protocol, network, alphaSchema) {
     setFavoriteFromStorage(store)
 
     // We reverse it again because the `reverse` operation is "in-place"
-    return serverFavorites.reverse()
+    return predefinedExamples.reverse()
 }
 
 function updateFavorite(favorites, fav) {

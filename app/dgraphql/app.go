@@ -24,6 +24,7 @@ import (
 	"github.com/dfuse-io/derr"
 	"github.com/dfuse-io/dgraphql"
 	"github.com/dfuse-io/dgraphql/metrics"
+	"github.com/dfuse-io/dgraphql/static"
 	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/dmetrics"
 	"github.com/dfuse-io/shutter"
@@ -39,24 +40,26 @@ type Config struct {
 	OverrideTraceID          bool
 	Protocol                 string
 	JwtIssuerURL             string
-	ApiKey                   string
+	APIKey                   string
 	DataIntegrityProofSecret string
 }
-type SchemaFactory interface {
-	Schemas() (*dgraphql.Schemas, error)
+
+type Modules struct {
+	PredefinedGraphqlExamples []*static.GraphqlExample
+	SchemaFactory             dgraphql.SchemaFactory
 }
 
 type App struct {
 	*shutter.Shutter
-	config        *Config
-	schemaFactory SchemaFactory
+	config  *Config
+	modules *Modules
 }
 
-func New(config *Config, schemaFactory SchemaFactory) *App {
+func New(config *Config, modules *Modules) *App {
 	return &App{
-		Shutter:       shutter.New(),
-		config:        config,
-		schemaFactory: schemaFactory,
+		Shutter: shutter.New(),
+		config:  config,
+		modules: modules,
 	}
 }
 
@@ -72,7 +75,7 @@ func (a *App) Run() error {
 	derr.Check("unable to initialize dmetering", err)
 	dmetering.SetDefaultMeter(meter)
 
-	schemas, err := a.schemaFactory.Schemas()
+	schemas, err := a.modules.SchemaFactory.Schemas()
 	if err != nil {
 		return err
 	}
@@ -89,7 +92,8 @@ func (a *App) Run() error {
 		schemas,
 		a.config.DataIntegrityProofSecret,
 		a.config.JwtIssuerURL,
-		a.config.ApiKey,
+		a.config.APIKey,
+		a.modules.PredefinedGraphqlExamples,
 	)
 
 	a.OnTerminating(server.Shutdown)

@@ -57,6 +57,10 @@ func WithAlpha() SchemaSelector {
 	return withAlpha(alpha)
 }
 
+type SchemaFactory interface {
+	Schemas() (*Schemas, error)
+}
+
 type Schemas struct {
 	standard *graphql.Schema
 	alpha    *graphql.Schema

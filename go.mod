@@ -25,6 +25,7 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/graph-gophers/graphql-go v0.0.0-20191115155744-f33e81362277
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
+	github.com/lithammer/dedent v1.1.0
 	github.com/prometheus/client_golang v1.2.1 // indirect
 	github.com/prometheus/client_model v0.1.0 // indirect
 	github.com/stretchr/testify v1.5.1

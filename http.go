@@ -15,7 +15,6 @@
 package dgraphql
 
 import (
-	"compress/gzip"
 	"context"
 	"fmt"
 	"net"
@@ -29,7 +28,6 @@ import (
 	"github.com/dfuse-io/dgraphql/apollo"
 	"github.com/dfuse-io/dgraphql/static"
 	"github.com/dfuse-io/dipp"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go/relay"
 	"go.uber.org/zap"
@@ -50,7 +48,13 @@ func (s *Server) startHTTPServer() {
 	})
 
 	staticRouter := router.PathPrefix("/").Subrouter()
-	static.RegisterStaticRoutes(staticRouter, s.protocol, s.getNetworkName(), s.apiKey, s.jwtIssuerURL)
+	staticRouter.Use(CompressionMiddleware)
+
+	err := static.RegisterStaticRoutes(staticRouter, s.protocol, s.getNetworkName(), s.apiKey, s.jwtIssuerURL, s.predfinedGraphqlExamples)
+	if err != nil {
+		s.Shutdown(fmt.Errorf("unable to register static routes: %w", err))
+		return
+	}
 
 	restRouter := router.PathPrefix("/").Subrouter()
 	restRouter.Use(LoggingMiddleware)
@@ -72,13 +76,14 @@ func (s *Server) startHTTPServer() {
 	// For now, we always serve the full schema, no matter what
 	standardSchemaHandler := &relay.Handler{Schema: s.schemas.GetSchema(WithAlpha())}
 
-	restRouter.Handle("/graphql", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	restRouter.Handle("/graphql", CompressionMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler := standardSchemaHandler
 		if isRequestingAlphaSchema(r) {
-			standardSchemaHandler.ServeHTTP(w, r)
-		} else {
-			standardSchemaHandler.ServeHTTP(w, r)
+			handler = standardSchemaHandler
 		}
-	}))
+
+		handler.ServeHTTP(w, r)
+	})))
 
 	// http
 	httpListener, err := net.Listen("tcp", s.httpListenAddr)
@@ -95,7 +100,7 @@ func (s *Server) startHTTPServer() {
 
 	corsMiddleware := NewCORSMiddleware()
 	httpServer := http.Server{
-		Handler:  handlers.CompressHandlerLevel(corsMiddleware(router), gzip.BestSpeed),
+		Handler:  corsMiddleware(router),
 		ErrorLog: errorLogger,
 	}
 

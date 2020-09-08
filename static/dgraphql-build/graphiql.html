@@ -47,7 +47,14 @@
 
     const { createDfuseClient } = dfuseClient
 
-    const client = createDfuseClient(window.DfuseClientConfig)
+    if (!window.DfuseClientConfig) {
+        window.DfuseClientConfig = {}
+    }
+
+    const client = createDfuseClient({
+        apiKey: window.DfuseClientConfig.apiKey || "web_123456789abcdef",
+        authUrl: window.DfuseClientConfig.authUrl || "null://",
+    })
     let token;
 
     async function initialize() {

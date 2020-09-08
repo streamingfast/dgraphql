@@ -15,6 +15,7 @@
 package dgraphql
 
 import (
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -26,6 +27,10 @@ import (
 	"github.com/graph-gophers/graphql-go"
 	gerrors "github.com/graph-gophers/graphql-go/errors"
 )
+
+func CompressionMiddleware(next http.Handler) http.Handler {
+	return handlers.CompressHandlerLevel(next, gzip.BestSpeed)
+}
 
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return &logging.Handler{
