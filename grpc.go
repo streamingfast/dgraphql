@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/dfuse-io/dauth/authenticator"
+	"github.com/dfuse-io/derr"
 	"github.com/dfuse-io/dgraphql/analytics"
 	"github.com/dfuse-io/dgraphql/insecure"
 	"github.com/dfuse-io/dgrpc"
@@ -54,6 +55,10 @@ func (s *Server) startGRPCServer() {
 
 	grpcRouter := mux.NewRouter()
 	grpcRouter.Path("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if derr.IsShuttingDown() {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
 		w.Write([]byte("ok"))
 	})
 	grpcRouter.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
