@@ -45,7 +45,6 @@ import (
 )
 
 func (s *Server) startGRPCServer() {
-
 	if !s.authenticator.IsAuthenticationTokenRequired() {
 		s.startGRPCServerInsecure()
 		return
@@ -61,6 +60,7 @@ func (s *Server) startGRPCServer() {
 		}
 		w.Write([]byte("ok"))
 	})
+
 	grpcRouter.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = maybeRewriteLegacyPaths(r.URL.Path)
 		internalGrpcServer.ServeHTTP(w, r)

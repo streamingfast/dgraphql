@@ -25,11 +25,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type grpcStatus interface {
+	GRPCStatus() *status.Status
+}
+
 func UnwrapError(ctx context.Context, err error) *errors.QueryError {
-	if se, ok := err.(interface{ GRPCStatus() *status.Status }); ok {
+	traceID := dtracing.GetTraceID(ctx).String()
+	if se, ok := err.(grpcStatus); ok {
 		sts := se.GRPCStatus().Proto()
 		msg := sts.Message
-		if traceID := dtracing.GetTraceID(ctx).String(); traceID != "" {
+		if traceID != "" {
 			msg = fmt.Sprintf("%s (trace_id: %s)", msg, traceID)
 		}
 		return &errors.QueryError{
@@ -42,7 +47,7 @@ func UnwrapError(ctx context.Context, err error) *errors.QueryError {
 	}
 
 	msg := err.Error()
-	if traceID := dtracing.GetTraceID(ctx).String(); traceID != "" {
+	if traceID != "" {
 		msg = fmt.Sprintf("%s (trace_id: %s)", msg, traceID)
 	}
 	return &errors.QueryError{
@@ -60,4 +65,22 @@ func Errorf(ctx context.Context, format string, args ...interface{}) *errors.Que
 
 func Status(ctx context.Context, code codes.Code, message string) *errors.QueryError {
 	return UnwrapError(ctx, derr.Status(code, message))
+}
+
+// IsDeadlineExceededError checks wheter error is `context.DeadlineExceeded` or a
+// gRPC RPC error for which the code is `codes.DeadlineExceeded`.
+func IsDeadlineExceededError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	if err == context.DeadlineExceeded {
+		return true
+	}
+
+	if status, ok := err.(grpcStatus); ok {
+		return status.GRPCStatus().Code() == codes.DeadlineExceeded
+	}
+
+	return false
 }
