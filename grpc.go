@@ -22,6 +22,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/derr"
@@ -32,6 +33,7 @@ import (
 	"github.com/dfuse-io/jsonpb"
 	"github.com/dfuse-io/logging"
 	pbgraphql "github.com/dfuse-io/pbgo/dfuse/graphql/v1"
+	"github.com/dfuse-io/shutter"
 	pbstruct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go"
@@ -50,7 +52,7 @@ func (s *Server) startGRPCServer() {
 		return
 	}
 
-	internalGrpcServer := newGRPCServer(s.schemas.GetSchema(WithAlpha()), s.authenticator, s.overrideTraceID)
+	internalGrpcServer := newGRPCServer(s.schemas.GetSchema(WithAlpha()), s.authenticator, s.overrideTraceID, s.Shutter)
 
 	grpcRouter := mux.NewRouter()
 	grpcRouter.Path("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -88,6 +90,17 @@ func (s *Server) startGRPCServer() {
 		ErrorLog: errorLogger,
 	}
 
+	s.OnTerminating(func(error) {
+		zlog.Info("sending shutdown signal to GRPC server")
+		ctx, _ := context.WithTimeout(context.Background(), time.Second)
+		err := grpcServer.Shutdown(ctx)
+		if err != nil {
+			zlog.Error("error on grpc server close", zap.Error(err))
+			return
+		}
+		zlog.Info("stop signal completed")
+	})
+
 	go func() {
 		zlog.Info("serving gRPC", zap.String("grpc_addr", s.grpcListenAddr))
 		if err := grpcServer.ServeTLS(grpcListener, "", ""); err != nil {
@@ -103,7 +116,12 @@ func (s *Server) startGRPCServerInsecure() {
 		return
 	}
 
-	gs := newGRPCServer(s.schemas.GetSchema(WithAlpha()), s.authenticator, s.overrideTraceID)
+	gs := newGRPCServer(s.schemas.GetSchema(WithAlpha()), s.authenticator, s.overrideTraceID, s.Shutter)
+	s.OnTerminating(func(error) {
+		zlog.Info("sending stop signal to GRPC server")
+		gs.GracefulStop()
+		zlog.Info("stop signal to GRPC server completed")
+	})
 	go func() {
 		zlog.Info("serving gRPC", zap.String("grpc_addr", s.grpcListenAddr))
 		if err := gs.Serve(grpcListener); err != nil {
@@ -112,7 +130,7 @@ func (s *Server) startGRPCServerInsecure() {
 	}()
 }
 
-func newGRPCServer(schema *graphql.Schema, authenticator authenticator.Authenticator, overrideTraceID bool) *grpc.Server {
+func newGRPCServer(schema *graphql.Schema, authenticator authenticator.Authenticator, overrideTraceID bool, shut *shutter.Shutter) *grpc.Server {
 	serverOptions := []dgrpc.ServerOption{dgrpc.WithLogger(zlog)}
 	if overrideTraceID {
 		serverOptions = append(serverOptions, dgrpc.OverrideTraceID())
@@ -120,18 +138,20 @@ func newGRPCServer(schema *graphql.Schema, authenticator authenticator.Authentic
 
 	zlog.Info("configuring grpc server")
 	gs := dgrpc.NewServer(serverOptions...)
-	pbgraphql.RegisterGraphQLServer(gs, NewEndpointServer(schema, authenticator))
+	pbgraphql.RegisterGraphQLServer(gs, NewEndpointServer(schema, authenticator, shut))
 
 	return gs
 }
 
 type EndpointServer struct {
+	serverShutter *shutter.Shutter
 	schema        *graphql.Schema
 	authenticator authenticator.Authenticator
 }
 
-func NewEndpointServer(schema *graphql.Schema, authenticator authenticator.Authenticator) *EndpointServer {
+func NewEndpointServer(schema *graphql.Schema, authenticator authenticator.Authenticator, shut *shutter.Shutter) *EndpointServer {
 	return &EndpointServer{
+		serverShutter: shut,
 		schema:        schema,
 		authenticator: authenticator,
 	}
@@ -198,6 +218,8 @@ func (s *EndpointServer) Execute(req *pbgraphql.Request, stream pbgraphql.GraphQ
 
 	for {
 		select {
+		case <-s.serverShutter.Terminating():
+			return status.Errorf(codes.Unavailable, "disconnected, try again")
 		case <-ctx.Done():
 			analytics.TrackSubscriptionContextDone(ctx, "grpc")
 			return nil

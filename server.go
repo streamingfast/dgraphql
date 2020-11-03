@@ -15,6 +15,8 @@
 package dgraphql
 
 import (
+	"time"
+
 	"github.com/dfuse-io/dauth/authenticator"
 	dauthAuthenticator "github.com/dfuse-io/dauth/authenticator"
 	_ "github.com/dfuse-io/dauth/authenticator/null" // register plugin
@@ -81,12 +83,16 @@ func (s *Server) Launch() {
 	s.startHTTPServer()
 	s.startGRPCServer()
 
+	<-s.Shutter.Terminating()
 	select {
-	case <-s.Shutter.Terminating():
-		if err := s.Err(); err != nil {
-			zlog.Error("dgraphql terminated with error", zap.Error(err))
-		} else {
-			zlog.Info("dgraphql terminated")
-		}
+	case <-s.Shutter.Terminated():
+	case <-time.After(2 * time.Second): // it should take at most 1sec, usually way faster
+		zlog.Warn("dgraphql not terminated gracefully")
+	}
+
+	if err := s.Err(); err != nil {
+		zlog.Error("dgraphql terminated with error", zap.Error(err))
+	} else {
+		zlog.Info("dgraphql terminated")
 	}
 }

@@ -20,6 +20,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	dauthMiddleware "github.com/dfuse-io/dauth/authenticator/middleware"
 	"github.com/dfuse-io/dmetering"
@@ -104,6 +105,12 @@ func (s *Server) startHTTPServer() {
 		ErrorLog: errorLogger,
 	}
 
+	s.OnTerminating(func(error) {
+		ctx, _ := context.WithTimeout(context.Background(), time.Second)
+		zlog.Info("sending stop signal to HTTP server")
+		httpServer.Shutdown(ctx)
+		zlog.Info("stop signal to HTTP server completed")
+	})
 	go func() {
 		zlog.Info("serving HTTP", zap.String("http_addr", s.httpListenAddr))
 		if err := httpServer.Serve(httpListener); err != nil {
