@@ -15,19 +15,30 @@
 package dgraphql
 
 import (
-	"os"
+	"context"
+	"fmt"
 
 	"github.com/dfuse-io/logging"
 	"go.uber.org/zap"
 )
 
-var traceEnabled = false
+var traceEnabled = logging.IsTraceEnabled("dgraphql", "github.com/dfuse-io/dgraphql")
 var zlog *zap.Logger
 
 func init() {
 	logging.Register("github.com/dfuse-io/dgraphql", &zlog)
+}
 
-	if os.Getenv("TRACE") == "true" {
-		traceEnabled = true
+type graphqlLogger struct{}
+
+func (*graphqlLogger) LogPanic(ctx context.Context, value interface{}) {
+	var err error
+	if v, ok := value.(error); ok {
+		err = v
+	} else {
+		err = fmt.Errorf("unknown error: %s", value)
 	}
+
+	logging.Logger(ctx, zlog).Error("graphlql resolver panicked", zap.Error(err))
+
 }

@@ -239,6 +239,7 @@ func parseSchema(name string, resolver interface{}, rawSchema string) (out *grap
 		graphql.MaxDepth(24), // this is good for at least 6 levels of `inlineTraces`, fetching its data, etc..
 		graphql.SubscribeResolverTimeout(10*time.Second),
 		graphql.Tracer(&OpencensusTracer{}),
+		graphql.Logger(&graphqlLogger{}),
 	)
 
 	if err != nil && os.Getenv("TRACE") == "true" {
