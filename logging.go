@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/dfuse-io/logging"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -39,6 +40,5 @@ func (*graphqlLogger) LogPanic(ctx context.Context, value interface{}) {
 		err = fmt.Errorf("unknown error: %s", value)
 	}
 
-	logging.Logger(ctx, zlog).Error("graphlql resolver panicked", zap.Error(err))
-
+	logging.Logger(ctx, zlog).Error("graphlql resolver panicked", zap.Error(errors.WithStack(err)))
 }
