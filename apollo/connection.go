@@ -124,7 +124,7 @@ func Connect(connectionID string, ws wsConnection, service GraphQLService, optio
 	}
 
 	defaultOpts := []func(conn *connection){
-		ReadLimit(1024 * 40),
+		ReadLimit(10 * 1024 * 1024), // 10 MB
 		WriteTimeout(10 * time.Second),
 	}
 
@@ -214,7 +214,7 @@ func (conn *connection) readLoop(ctx context.Context, send sendFunc) {
 		var msg operationMessage
 		err := conn.ws.ReadJSON(&msg)
 		if err != nil {
-			conn.logger.Debug("got an error while trying to read message from websocket")
+			conn.logger.Info("error trying to read message from websocket, closing connection", zap.Error(err))
 			return
 		}
 
