@@ -25,6 +25,8 @@ import (
 )
 
 func TestNewPaginator(t *testing.T) {
+	trxCursorDecoder := NewOpaqueProtoCursorDecoder(func() proto.Message { return &pbgraphql.TransactionCursor{} })
+
 	tests := []struct {
 		name            string
 		firstReq        *types.Uint32
@@ -32,7 +34,7 @@ func TestNewPaginator(t *testing.T) {
 		before          *string
 		after           *string
 		limit           uint32
-		cursorFactory   func() proto.Message
+		cursorDecoder   CursorDecoder
 		expectPaginator *Paginator
 		expectError     bool
 	}{
@@ -134,9 +136,7 @@ func TestNewPaginator(t *testing.T) {
 				Ver:             1,
 				TransactionHash: "abababab",
 			}, "test_transaction_cursor")),
-			cursorFactory: func() proto.Message {
-				return &pbgraphql.TransactionCursor{}
-			},
+			cursorDecoder: trxCursorDecoder,
 			expectPaginator: &Paginator{
 				beforeKey: "abababab",
 			},
@@ -151,27 +151,23 @@ func TestNewPaginator(t *testing.T) {
 				Ver:             1,
 				TransactionHash: "cdcdcdcd",
 			}, "test_transaction_cursor")),
-			cursorFactory: func() proto.Message {
-				return &pbgraphql.TransactionCursor{}
-			},
+			cursorDecoder: trxCursorDecoder,
 			expectPaginator: &Paginator{
 				beforeKey: "abababab",
 				afterKey:  "cdcdcdcd",
 			},
 		},
 		{
-			name:   "paginator with in-valid before cursor ",
-			before: s("adsf"),
-			cursorFactory: func() proto.Message {
-				return &pbgraphql.TransactionCursor{}
-			},
-			expectError: true,
+			name:          "paginator with in-valid before cursor ",
+			before:        s("adsf"),
+			cursorDecoder: trxCursorDecoder,
+			expectError:   true,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			paginator, err := NewPaginator(test.firstReq, test.lastReq, test.before, test.after, test.limit, test.cursorFactory)
+			paginator, err := NewPaginator(test.firstReq, test.lastReq, test.before, test.after, test.limit, test.cursorDecoder)
 			if test.expectError {
 				require.Error(t, err)
 			} else {

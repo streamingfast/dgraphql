@@ -15,9 +15,11 @@
 package dgraphql
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/dfuse-io/dgraphql/types"
+	"github.com/dfuse-io/opaque"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -30,8 +32,7 @@ type Paginator struct {
 	HasNextPage     bool
 }
 
-func NewPaginator(firstReq, lastReq *types.Uint32, before, after *string, limit uint32, cursorFactory func() proto.Message) (*Paginator, error) {
-
+func NewPaginator(firstReq, lastReq *types.Uint32, before, after *string, limit uint32, cursorDecoder CursorDecoder) (*Paginator, error) {
 	first := uint32(0)
 	if firstReq != nil {
 		first = uint32(*firstReq)
@@ -55,22 +56,19 @@ func NewPaginator(firstReq, lastReq *types.Uint32, before, after *string, limit 
 		first = limit
 	}
 
+	var err error
 	if before != nil {
-		beforeCursor := cursorFactory()
-		err := UnmarshalCursorProto(*before, beforeCursor)
+		beforeKey, err = cursorDecoder.Decode(*before)
 		if err != nil {
-			return nil, fmt.Errorf("unable to process before cursor: %s", err)
+			return nil, fmt.Errorf("unable to process before cursor: %w", err)
 		}
-		beforeKey = beforeCursor.(Keyable).Key()
 	}
 
 	if after != nil {
-		afterCursor := cursorFactory()
-		err := UnmarshalCursorProto(*after, afterCursor)
+		afterKey, err = cursorDecoder.Decode(*after)
 		if err != nil {
-			return nil, fmt.Errorf("unable to process after cursor: %s", err)
+			return nil, fmt.Errorf("unable to process after cursor: %w", err)
 		}
-		afterKey = afterCursor.(Keyable).Key()
 	}
 
 	return &Paginator{
@@ -81,6 +79,8 @@ func NewPaginator(firstReq, lastReq *types.Uint32, before, after *string, limit 
 	}, nil
 }
 
+// Paginate takes a full slice of results and returns a paginated view of them, for example the elements after
+// a given key or the elements in-between an after and before key.
 func (p *Paginator) Paginate(results Pagineable) Pagineable {
 	validBeforeKey := false
 	validAfterKey := false
@@ -140,7 +140,7 @@ func (p *Paginator) Paginate(results Pagineable) Pagineable {
 	if (p.first > 0) && (int(p.first) < len(indexes)) {
 		indexes = indexes[0:p.first]
 	} else if (p.last > 0) && (int(p.last) < len(indexes)) {
-		indexes = indexes[(len(indexes) - int(p.last)):len(indexes)]
+		indexes = indexes[(len(indexes) - int(p.last)):]
 	}
 
 	if len(indexes) == 0 {
@@ -188,7 +188,53 @@ func (p PagineableStrings) IsEqual(index int, key string) bool {
 func (p PagineableStrings) Append(slice Pagineable, index int) Pagineable {
 	if slice == nil {
 		return Pagineable(PagineableStrings([]string{p[index]}))
-	} else {
-		return Pagineable(append(slice.(PagineableStrings), p[index]))
 	}
+
+	return Pagineable(append(slice.(PagineableStrings), p[index]))
+}
+
+type CursorDecoder interface {
+	Decode(string) (string, error)
+}
+
+var IdentityCursorDecoder = &identityCursorDecoder{}
+
+type identityCursorDecoder struct {
+}
+
+func (d *identityCursorDecoder) Decode(input string) (string, error) {
+	return input, nil
+}
+
+type OpaqueProtoCursorDecoder struct {
+	EntityFactory func() proto.Message
+}
+
+func NewOpaqueProtoCursorDecoder(factory func() proto.Message) OpaqueProtoCursorDecoder {
+	return OpaqueProtoCursorDecoder{EntityFactory: factory}
+}
+
+func (d OpaqueProtoCursorDecoder) Decode(input string) (string, error) {
+	h, err := opaque.DecodeToString(input)
+	if err != nil {
+		return "", fmt.Errorf("unable to decode opaque cursor %q: %w", input, err)
+	}
+
+	data, err := hex.DecodeString(h)
+	if err != nil {
+		return "", fmt.Errorf("unable to decode proto cursor %q: %w", input, err)
+	}
+
+	entity := d.EntityFactory()
+	keyable, ok := entity.(Keyable)
+	if !ok {
+		return "", fmt.Errorf("type %T does not implement 'dgraphql.Keyable' interface, it must implement for this method to work", entity)
+	}
+
+	err = proto.Unmarshal(data, entity)
+	if err != nil {
+		return "", fmt.Errorf("invalid cursor: %w", err)
+	}
+
+	return keyable.Key(), nil
 }

@@ -92,7 +92,9 @@ func (s *Server) startGRPCServer() {
 
 	s.OnTerminating(func(error) {
 		zlog.Info("sending shutdown signal to GRPC server")
-		ctx, _ := context.WithTimeout(context.Background(), time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+
 		err := grpcServer.Shutdown(ctx)
 		if err != nil {
 			zlog.Error("error on grpc server close", zap.Error(err))
@@ -184,8 +186,7 @@ func (s *EndpointServer) Execute(req *pbgraphql.Request, stream pbgraphql.GraphQ
 		token = strings.TrimPrefix(authValues[0], "Bearer ")
 	}
 
-	mdIn, _ := metadata.FromIncomingContext(ctx)
-	xff := mdIn.Get("x-forwarded-for")
+	xff := md.Get("x-forwarded-for")
 	ip := authenticator.RealIP(strings.Join(xff, ", "))
 
 	var e error
