@@ -24,26 +24,27 @@ import (
 	"github.com/dfuse-io/dtracing"
 	"github.com/graph-gophers/graphql-go/errors"
 	"github.com/graph-gophers/graphql-go/introspection"
+	"github.com/graph-gophers/graphql-go/selected"
 	gqtrace "github.com/graph-gophers/graphql-go/trace"
 	"go.opencensus.io/trace"
 )
 
-type OpencensusTracer struct {
+type Tracer struct {
 }
 
-func (t *OpencensusTracer) TraceQuery(
+func (t *Tracer) TraceRequest(
 	ctx context.Context,
 	queryString string,
+	opType string,
 	operationName string,
 	variables map[string]interface{},
 	varTypes map[string]*introspection.Type,
-) (context.Context, gqtrace.TraceQueryFinishFunc) {
-	startTime := time.Now()
-	metrics.InflightQueryCount.Inc()
+) (context.Context, gqtrace.TraceRequestFinishFunc) {
+	metrics.InflightRequestCount.Inc()
+	metrics.TotalRequestCount.Inc()
 
-	spanCtx, span := dtracing.StartSpan(ctx, "GraphQL request",
-		"graphql.query", queryString,
-		"graphql.operationName", operationName,
+	spanCtx, span := dtracing.StartSpan(ctx, "GraphQL Request",
+		"graphql.operationType", opType,
 		"graphql.variablesCount", len(variables),
 	)
 
@@ -53,12 +54,69 @@ func (t *OpencensusTracer) TraceQuery(
 		}
 
 		span.End()
-		metrics.InflightQueryCount.Dec()
-		metrics.QueryResponseTimes.ObserveSince(startTime)
+		metrics.InflightRequestCount.Dec()
 	}
 }
 
-func (t *OpencensusTracer) TraceField(
+func (*Tracer) TraceQuery(ctx context.Context, root selected.Field) (context.Context, gqtrace.TraceOperationFinishFunc) {
+	fieldName := root.Identifier()
+	if fieldName == "__schema" {
+		// It's an introspection schema request, let's ignore them
+		return ctx, func() {}
+	}
+
+	startTime := time.Now()
+	metrics.InflightQueryCount.Inc(fieldName)
+	metrics.TotalQueryCount.Inc(fieldName)
+
+	spanCtx, span := dtracing.StartSpan(ctx, "GraphQL Query",
+		"graphql.query.type", fieldName,
+	)
+
+	return spanCtx, func() {
+		span.End()
+
+		metrics.InflightQueryCount.Dec(fieldName)
+		metrics.QueryResponseTimes.ObserveSince(startTime, fieldName)
+	}
+}
+
+func (*Tracer) TraceMutation(ctx context.Context, root selected.Field) (context.Context, gqtrace.TraceOperationFinishFunc) {
+	fieldName := root.Identifier()
+
+	startTime := time.Now()
+	metrics.InflightMutationCount.Inc(fieldName)
+	metrics.TotalMutationCount.Inc(fieldName)
+
+	spanCtx, span := dtracing.StartSpan(ctx, "GraphQL Mutation",
+		"graphql.mutation.type", fieldName,
+	)
+
+	return spanCtx, func() {
+		span.End()
+
+		metrics.InflightMutationCount.Dec(fieldName)
+		metrics.MutationResponseTimes.ObserveSince(startTime, fieldName)
+	}
+}
+
+func (*Tracer) TraceSubscription(ctx context.Context, root selected.Field) (context.Context, gqtrace.TraceOperationFinishFunc) {
+	fieldName := root.Identifier()
+
+	metrics.InflightSubscriptionCount.Inc(fieldName)
+	metrics.TotalSubscriptionCount.Inc(fieldName)
+
+	spanCtx, span := dtracing.StartSpan(ctx, "GraphQL Subscription",
+		"graphql.subscription.type", fieldName,
+	)
+
+	return spanCtx, func() {
+		span.End()
+		metrics.InflightSubscriptionCount.Dec(fieldName)
+	}
+}
+
+func (t *Tracer) TraceField(
 	ctx context.Context,
 	label, typeName, fieldName string,
 	trivial bool,
@@ -82,7 +140,7 @@ func (t *OpencensusTracer) TraceField(
 		"graphql.field", fieldName,
 	)
 
-	spanCtx, span := dtracing.StartSpan(ctx, "GraphQL request", keyedAttributes...)
+	spanCtx, span := dtracing.StartSpan(ctx, "GraphQL Field", keyedAttributes...)
 
 	return spanCtx, func(err *errors.QueryError) {
 		if err != nil {

@@ -238,7 +238,7 @@ func parseSchema(name string, resolver interface{}, rawSchema string) (out *grap
 		graphql.UseFieldResolvers(),
 		graphql.MaxDepth(24), // this is good for at least 6 levels of `inlineTraces`, fetching its data, etc..
 		graphql.SubscribeResolverTimeout(10*time.Second),
-		graphql.Tracer(&OpencensusTracer{}),
+		graphql.Tracer(&Tracer{}),
 		graphql.Logger(&graphqlLogger{}),
 	)
 
