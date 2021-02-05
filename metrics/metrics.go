@@ -30,7 +30,7 @@ var HeadBlockNumber = MetricSet.NewHeadBlockNumber("dgraphql")
 var HeadTimeDrift = MetricSet.NewHeadTimeDrift("dgraphql")
 
 // TotalRequestCount records total count of request (either a Query, Mutation or Subscription)
-var TotalRequestCount = MetricSet.NewGauge("dgraphql_total_request_count", "total count of request served since startup time")
+var TotalRequestCount = MetricSet.NewCounter("dgraphql_total_request_count", "total count of request served since startup time")
 
 // InflightRequestCount records active count of request (either an active Query, Mutation or Subscription)
 var InflightRequestCount = MetricSet.NewGauge("dgraphql_inflight_request_count", "inflight request count currently active")
@@ -39,7 +39,7 @@ var InflightRequestCount = MetricSet.NewGauge("dgraphql_inflight_request_count",
 var InflightQueryCount = MetricSet.NewGaugeVec("dgraphql_inflight_query_count", perGraphqlLabels, "inflight query count currently active, per GraphQL type")
 
 // TotalQueryCount records total count of query performed so far, per GraphQL type
-var TotalQueryCount = MetricSet.NewGaugeVec("dgraphql_total_query_count", perGraphqlLabels, "total count of query started since startup time, per GraphQL type")
+var TotalQueryCount = MetricSet.NewCounterVec("dgraphql_total_query_count", perGraphqlLabels, "total count of query started since startup time, per GraphQL type")
 
 // QueryResponseTimes records histogram of "query" time taken to answer
 var QueryResponseTimes = MetricSet.NewHistogramVec("dgraphql_query_response_times", perGraphqlLabels, "query response times histogram for percentile sampling, per GraphQL type")
@@ -48,7 +48,7 @@ var QueryResponseTimes = MetricSet.NewHistogramVec("dgraphql_query_response_time
 var InflightMutationCount = MetricSet.NewGaugeVec("dgraphql_inflight_mutation_count", perGraphqlLabels, "inflight mutation count currently active, per GraphQL type")
 
 // TotalMutationCount records total count of mutation performed so far, per GraphQL type
-var TotalMutationCount = MetricSet.NewGaugeVec("dgraphql_total_mutation_count", perGraphqlLabels, "total count of mutation started since startup time, per GraphQL type")
+var TotalMutationCount = MetricSet.NewCounterVec("dgraphql_total_mutation_count", perGraphqlLabels, "total count of mutation started since startup time, per GraphQL type")
 
 // MutationResponseTimes records histogram of "mutation" time taken to answer
 var MutationResponseTimes = MetricSet.NewHistogramVec("dgraphql_mutation_response_times", perGraphqlLabels, "mutation response times histogram for percentile sampling, per GraphQL type")
@@ -57,4 +57,4 @@ var MutationResponseTimes = MetricSet.NewHistogramVec("dgraphql_mutation_respons
 var InflightSubscriptionCount = MetricSet.NewGaugeVec("dgraphql_inflight_subscription_count", perGraphqlLabels, "inflight subscription count currently active, per GraphQL type")
 
 // TotalSubscriptionCount records total count of query performed so far, per GraphQL type (top-level subscription element)
-var TotalSubscriptionCount = MetricSet.NewGaugeVec("dgraphql_total_subscription_count", perGraphqlLabels, "total count of subscription started since startup time, per GraphQL type")
+var TotalSubscriptionCount = MetricSet.NewCounterVec("dgraphql_total_subscription_count", perGraphqlLabels, "total count of subscription started since startup time, per GraphQL type")
