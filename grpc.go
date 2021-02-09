@@ -47,7 +47,7 @@ import (
 )
 
 func (s *Server) startGRPCServer() {
-	if !s.authenticator.IsAuthenticationTokenRequired() {
+	if !s.grpcSSL {
 		s.startGRPCServerInsecure()
 		return
 	}

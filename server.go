@@ -15,6 +15,7 @@
 package dgraphql
 
 import (
+	"strings"
 	"time"
 
 	"github.com/dfuse-io/dauth/authenticator"
@@ -30,6 +31,7 @@ type Server struct {
 	*shutter.Shutter
 
 	grpcListenAddr  string
+	grpcSSL         bool
 	httpListenAddr  string
 	protocol        string
 	networkID       string
@@ -62,9 +64,20 @@ func NewServer(
 	if authenticator == nil {
 		authenticator, _ = dauthAuthenticator.New("null://")
 	}
+
+	grpcSSL := false
+	if authenticator.IsAuthenticationTokenRequired() {
+		grpcSSL = true // auth always requires SSL
+	}
+	if strings.Contains(grpcListenAddr, "*") {
+		grpcSSL = true
+		grpcListenAddr = strings.Replace(grpcListenAddr, "*", "", 1)
+	}
+
 	return &Server{
 		Shutter:                  shutter.New(),
 		grpcListenAddr:           grpcListenAddr,
+		grpcSSL:                  grpcSSL,
 		httpListenAddr:           httpListenAddr,
 		protocol:                 protocol,
 		networkID:                networkID,
