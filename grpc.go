@@ -33,6 +33,7 @@ import (
 	"github.com/dfuse-io/jsonpb"
 	"github.com/dfuse-io/logging"
 	pbgraphql "github.com/dfuse-io/pbgo/dfuse/graphql/v1"
+	pbhealth "github.com/dfuse-io/pbgo/grpc/health/v1"
 	"github.com/dfuse-io/shutter"
 	pbstruct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/gorilla/mux"
@@ -141,6 +142,7 @@ func newGRPCServer(schema *graphql.Schema, authenticator authenticator.Authentic
 	zlog.Info("configuring grpc server")
 	gs := dgrpc.NewServer(serverOptions...)
 	pbgraphql.RegisterGraphQLServer(gs, NewEndpointServer(schema, authenticator, shut))
+	pbhealth.RegisterHealthServer(gs, healthGRPCHandler{})
 
 	return gs
 }
@@ -372,4 +374,16 @@ func maybeRewriteLegacyPaths(urlPath string) string {
 		return strings.Replace(urlPath, "/dfuse.eosio.v1.GraphQL", "/dfuse.graphql.v1.GraphQL", 1)
 	}
 	return urlPath
+}
+
+// FIXME: healthcheck will be included in dgrpc NewServer2
+type healthGRPCHandler struct{}
+
+func (c healthGRPCHandler) Check(ctx context.Context, _ *pbhealth.HealthCheckRequest) (*pbhealth.HealthCheckResponse, error) {
+	status := pbhealth.HealthCheckResponse_SERVING
+	if derr.IsShuttingDown() {
+		status = pbhealth.HealthCheckResponse_NOT_SERVING
+	}
+
+	return &pbhealth.HealthCheckResponse{Status: status}, nil
 }
