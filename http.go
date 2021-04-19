@@ -35,10 +35,6 @@ import (
 )
 
 func (s *Server) startHTTPServer() {
-	apolloAuthenticator := func(ctx context.Context, token string, ip string) (context.Context, error) {
-		return s.authenticator.Check(ctx, token, ip)
-	}
-
 	router := mux.NewRouter()
 	router.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if derr.IsShuttingDown() {
@@ -59,7 +55,7 @@ func (s *Server) startHTTPServer() {
 
 	restRouter := router.PathPrefix("/").Subrouter()
 	restRouter.Use(LoggingMiddleware)
-	restRouter.Use(apollo.NewMiddleware(s.schemas.GetSchema(WithAlpha()), apolloAuthenticator).Handler)
+	restRouter.Use(apollo.NewMiddleware(s.schemas.GetSchema(WithAlpha()), s.authenticator).Handler)
 	restRouter.Use(dauthMiddleware.NewAuthMiddleware(s.authenticator, AuthErrorHandler).Handler)
 	if s.DataIntegrityProofSecret != "" {
 		restRouter.Use(dipp.NewProofMiddlewareFunc(s.DataIntegrityProofSecret))

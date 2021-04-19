@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dfuse-io/dauth/authenticator"
+	dauth "github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/dtracing"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -34,31 +34,41 @@ var upgrader = websocket.Upgrader{
 }
 
 type Middleware struct {
-	service          GraphQLService
-	authenticateFunc AuthenticateFunc
+	service       GraphQLService
+	authenticator dauth.Authenticator
 }
 
-func NewMiddleware(service GraphQLService, authenticate func(context.Context, string, string) (context.Context, error)) *Middleware {
+func NewMiddleware(service GraphQLService, authenticator dauth.Authenticator) *Middleware {
 	return &Middleware{
-		service: service,
-		authenticateFunc: func(ctx context.Context, r *http.Request, payload map[string]interface{}) (context.Context, error) {
-			if tokenObject, ok := payload["Authorization"]; ok {
-				if tokenString, ok := tokenObject.(string); ok {
-					tokenString := strings.TrimPrefix(tokenString, "Bearer ")
-
-					ip := authenticator.RealIPFromRequest(r)
-					ctx, err := authenticate(ctx, tokenString, ip)
-					if err != nil {
-						return nil, err
-					}
-					return ctx, nil
-				}
-				return nil, fmt.Errorf("expected 'Authorization' to be of string type")
-			}
-
-			return nil, fmt.Errorf("missing 'Authorization' from 'connection_init' payload")
-		},
+		service:       service,
+		authenticator: authenticator,
 	}
+}
+
+func (m *Middleware) authenticate(ctx context.Context, r *http.Request, payload map[string]interface{}) (context.Context, error) {
+	token := ""
+	if m.authenticator.IsAuthenticationTokenRequired() {
+		tokenObject, ok := payload["Authorization"]
+		if !ok {
+			return nil, fmt.Errorf("missing 'Authorization' from 'connection_init' payload")
+		}
+
+		tokenString, ok := tokenObject.(string)
+		if !ok {
+			return nil, fmt.Errorf("expected 'Authorization' to be of string type")
+
+		}
+
+		token = strings.TrimPrefix(tokenString, "Bearer ")
+	}
+
+	ip := dauth.RealIPFromRequest(r)
+	ctx, err := m.authenticator.Check(ctx, token, ip)
+	if err != nil {
+		return nil, err
+	}
+
+	return ctx, nil
 }
 
 func (m *Middleware) Handler(next http.Handler) http.Handler {
@@ -85,7 +95,8 @@ func (m *Middleware) Handler(next http.Handler) http.Handler {
 				connectionTraceID := dtracing.GetTraceID(r.Context())
 
 				zlog.Debug("websocket connection initialized correctly, continuing connection process")
-				go Connect(connectionTraceID.String(), ws, m.service, Authentication(r, m.authenticateFunc))
+
+				go Connect(connectionTraceID.String(), ws, m.service, Authentication(r, m.authenticate))
 				return
 			}
 		}
