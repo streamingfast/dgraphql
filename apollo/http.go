@@ -47,16 +47,16 @@ func NewMiddleware(service GraphQLService, authenticator dauth.Authenticator) *M
 
 func (m *Middleware) authenticate(ctx context.Context, r *http.Request, payload map[string]interface{}) (context.Context, error) {
 	token := ""
-	if m.authenticator.IsAuthenticationTokenRequired() {
-		tokenObject, ok := payload["Authorization"]
-		if !ok {
-			return nil, fmt.Errorf("missing 'Authorization' from 'connection_init' payload")
-		}
 
+	tokenObject, found := payload["Authorization"]
+	if m.authenticator.IsAuthenticationTokenRequired() && !found {
+		return nil, fmt.Errorf("missing 'Authorization' from 'connection_init' payload")
+	}
+
+	if found {
 		tokenString, ok := tokenObject.(string)
 		if !ok {
 			return nil, fmt.Errorf("expected 'Authorization' to be of string type")
-
 		}
 
 		token = strings.TrimPrefix(tokenString, "Bearer ")

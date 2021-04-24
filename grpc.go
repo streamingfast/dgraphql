@@ -179,22 +179,23 @@ func (s *EndpointServer) Execute(req *pbgraphql.Request, stream pbgraphql.GraphQ
 	}
 
 	token := ""
-	if s.authenticator.IsAuthenticationTokenRequired() {
-		authValues := md["authorization"]
-		if len(authValues) < 1 {
-			err := status.Errorf(codes.Unauthenticated, "missing 'authorization' metadata field")
-			return err
-		}
+	authValues := md["authorization"]
+	if s.authenticator.IsAuthenticationTokenRequired() && len(authValues) <= 0 {
+		err := status.Errorf(codes.Unauthenticated, "missing 'authorization' metadata field")
+		return err
+	}
+
+	if len(authValues) > 0 {
 		token = strings.TrimPrefix(authValues[0], "Bearer ")
 	}
 
 	xff := md.Get("x-forwarded-for")
 	ip := authenticator.RealIP(strings.Join(xff, ", "))
 
-	var e error
-	ctx, e = s.authenticator.Check(ctx, token, ip)
-	if e != nil {
-		return status.Errorf(codes.Unauthenticated, e.Error())
+	var err error
+	ctx, err = s.authenticator.Check(ctx, token, ip)
+	if err != nil {
+		return status.Errorf(codes.Unauthenticated, err.Error())
 	}
 
 	analytics.TrackSubscriptionStart(ctx, "grpc")
