@@ -35,6 +35,7 @@ const (
 	MIME_TYPE_HTML = "text/html"
 	MIME_TYPE_JS   = "application/javascript"
 	MIME_TYPE_JSON = "application/json"
+	MIME_TYPE_SVG  = "image/svg+xml"
 )
 
 // RegisterStaticRoutes registers all GraphiQL static route enabling traffic of `/graphiql` paths.
@@ -58,6 +59,7 @@ func RegisterStaticRoutes(router *mux.Router, protocol, network, apiKey, jwtIssu
 	serveIndexHTML(router, box, "/graphiql/", apiKey, jwtIssuerURL)
 	serveFileAsset(router, box, "/graphiql/graphiql_dfuse_override.css", "graphiql_dfuse_override.css", MIME_TYPE_CSS)
 	serveFileAsset(router, box, "/graphiql/helper.js", "helper.js", MIME_TYPE_JS)
+	serveFileAsset(router, box, "/graphiql/dfuse_logo.svg", "dfuse_logo.svg", MIME_TYPE_SVG)
 
 	graphqlExamplesJSON, err := json.Marshal(predfinedGraphqlExamples)
 	if err != nil {
@@ -113,6 +115,7 @@ func serveFileAsset(router *mux.Router, box *rice.Box, path string, asset string
 	router.HandleFunc(path, http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		reader, err := box.Open(asset)
 		if err != nil {
+			zlog.Error("unable to server static file asset from box", zap.Error(err))
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("unable to read asset"))
 			return

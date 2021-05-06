@@ -15,10 +15,10 @@
  */
 
 .graphiql-container .topBar {
-    background-image: url('https://www.dfuse.io/hubfs/dfuse-graphiQL-logo-white-03-01.svg');
-    background-size: auto 31px;
+    background-image: url('/graphiql/dfuse_logo.svg');
+    background-size: auto 48px;
     background-repeat: no-repeat;
-    background-position: 10px 12px;
+    background-position: 10px 4px;
     background-position-x: right;
     height:44px;
     border-bottom: 1px solid #c9cacf;
