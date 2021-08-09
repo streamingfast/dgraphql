@@ -20,14 +20,14 @@ import (
 	"net/http"
 	"time"
 
-	dauthAuthenticator "github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/derr"
-	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/dmetrics"
 	"github.com/dfuse-io/shutter"
+	dauthAuthenticator "github.com/streamingfast/dauth/authenticator"
 	"github.com/streamingfast/dgraphql"
 	"github.com/streamingfast/dgraphql/metrics"
 	"github.com/streamingfast/dgraphql/static"
+	"github.com/streamingfast/dmetering"
 	"go.uber.org/zap"
 )
 

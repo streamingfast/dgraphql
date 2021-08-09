@@ -18,12 +18,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dfuse-io/dauth/authenticator"
-	dauthAuthenticator "github.com/dfuse-io/dauth/authenticator"
-	_ "github.com/dfuse-io/dauth/authenticator/null" // register plugin
-	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/shutter"
+	"github.com/streamingfast/dauth/authenticator"
+	dauthAuthenticator "github.com/streamingfast/dauth/authenticator"
+	_ "github.com/streamingfast/dauth/authenticator/null" // register plugin
 	"github.com/streamingfast/dgraphql/static"
+	"github.com/streamingfast/dmetering"
 	"go.uber.org/zap"
 )
 
@@ -66,7 +66,7 @@ func NewServer(
 	}
 
 	grpcSSL := false
-	if authenticator.IsAuthenticationTokenRequired() {
+	if authenticator.GetAuthTokenRequirement() == dauthAuthenticator.AuthTokenRequired {
 		grpcSSL = true // auth always requires SSL
 	}
 	if strings.Contains(grpcListenAddr, "*") {

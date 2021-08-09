@@ -24,10 +24,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/derr"
 	"github.com/dfuse-io/dgrpc"
-	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/jsonpb"
 	"github.com/dfuse-io/logging"
 	pbgraphql "github.com/dfuse-io/pbgo/dfuse/graphql/v1"
@@ -37,8 +35,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/errors"
+	"github.com/streamingfast/dauth/authenticator"
 	"github.com/streamingfast/dgraphql/analytics"
 	"github.com/streamingfast/dgraphql/insecure"
+	"github.com/streamingfast/dmetering"
 	"go.opencensus.io/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -180,7 +180,7 @@ func (s *EndpointServer) Execute(req *pbgraphql.Request, stream pbgraphql.GraphQ
 
 	token := ""
 	authValues := md["authorization"]
-	if s.authenticator.IsAuthenticationTokenRequired() && len(authValues) <= 0 {
+	if s.authenticator.GetAuthTokenRequirement() == authenticator.AuthTokenRequired && len(authValues) <= 0 {
 		err := status.Errorf(codes.Unauthenticated, "missing 'authorization' metadata field")
 		return err
 	}

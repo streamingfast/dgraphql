@@ -20,9 +20,9 @@ import (
 	"net/http"
 	"strings"
 
-	dauth "github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/dtracing"
 	"github.com/gorilla/websocket"
+	dauth "github.com/streamingfast/dauth/authenticator"
 	"go.uber.org/zap"
 )
 
@@ -49,7 +49,7 @@ func (m *Middleware) authenticate(ctx context.Context, r *http.Request, payload 
 	token := ""
 
 	tokenObject, found := payload["Authorization"]
-	if m.authenticator.IsAuthenticationTokenRequired() && !found {
+	if m.authenticator.GetAuthTokenRequirement() == dauth.AuthTokenRequired && !found {
 		return nil, fmt.Errorf("missing 'Authorization' from 'connection_init' payload")
 	}
 

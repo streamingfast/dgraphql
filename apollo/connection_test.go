@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dfuse-io/dauth/authenticator"
+	"github.com/streamingfast/dauth/authenticator"
 )
 
 type messageIntention int

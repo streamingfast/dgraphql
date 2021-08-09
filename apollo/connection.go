@@ -22,14 +22,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dfuse-io/dauth/authenticator"
-	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/dtracing"
 	"github.com/dfuse-io/logging"
 	"github.com/gorilla/websocket"
 	"github.com/graph-gophers/graphql-go"
 	gqerrors "github.com/graph-gophers/graphql-go/errors"
+	"github.com/streamingfast/dauth/authenticator"
 	"github.com/streamingfast/dgraphql/analytics"
+	"github.com/streamingfast/dmetering"
 	"go.uber.org/zap"
 )
 

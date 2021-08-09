@@ -22,8 +22,8 @@ import (
 	"strings"
 	"time"
 
-	dauthMiddleware "github.com/dfuse-io/dauth/authenticator/middleware"
-	"github.com/dfuse-io/dmetering"
+	dauthMiddleware "github.com/streamingfast/dauth/authenticator/middleware"
+	"github.com/streamingfast/dmetering"
 
 	"github.com/dfuse-io/derr"
 	"github.com/dfuse-io/dipp"
