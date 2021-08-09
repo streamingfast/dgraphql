@@ -22,5 +22,5 @@ import (
 var zlog *zap.Logger
 
 func init() {
-	logging.Register("github.com/dfuse-io/dgraphql/app/dgraphql", &zlog)
+	logging.Register("github.com/streamingfast/dgraphql/app/dgraphql", &zlog)
 }

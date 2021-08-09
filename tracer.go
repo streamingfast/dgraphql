@@ -20,12 +20,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dfuse-io/dgraphql/metrics"
 	"github.com/dfuse-io/dtracing"
 	"github.com/graph-gophers/graphql-go/errors"
 	"github.com/graph-gophers/graphql-go/introspection"
 	"github.com/graph-gophers/graphql-go/selected"
 	gqtrace "github.com/graph-gophers/graphql-go/trace"
+	"github.com/streamingfast/dgraphql/metrics"
 	"go.opencensus.io/trace"
 )
 

@@ -18,9 +18,9 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/dfuse-io/dgraphql/types"
 	"github.com/dfuse-io/opaque"
 	"github.com/golang/protobuf/proto"
+	"github.com/streamingfast/dgraphql/types"
 )
 
 type Paginator struct {

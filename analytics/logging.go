@@ -14,7 +14,6 @@
 
 package analytics
 
-
 import (
 	"github.com/dfuse-io/logging"
 	"go.uber.org/zap"
@@ -23,5 +22,5 @@ import (
 var zlog *zap.Logger
 
 func init() {
-	logging.Register("github.com/dfuse-io/dgraphql/analytics", &zlog)
+	logging.Register("github.com/streamingfast/dgraphql/analytics", &zlog)
 }

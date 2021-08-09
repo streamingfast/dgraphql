@@ -21,9 +21,9 @@ import (
 	"github.com/dfuse-io/dauth/authenticator"
 	dauthAuthenticator "github.com/dfuse-io/dauth/authenticator"
 	_ "github.com/dfuse-io/dauth/authenticator/null" // register plugin
-	"github.com/dfuse-io/dgraphql/static"
 	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/shutter"
+	"github.com/streamingfast/dgraphql/static"
 	"go.uber.org/zap"
 )
 

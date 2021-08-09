@@ -23,11 +23,11 @@ import (
 	"go.uber.org/zap"
 )
 
-var traceEnabled = logging.IsTraceEnabled("dgraphql", "github.com/dfuse-io/dgraphql")
+var traceEnabled = logging.IsTraceEnabled("dgraphql", "github.com/streamingfast/dgraphql")
 var zlog *zap.Logger
 
 func init() {
-	logging.Register("github.com/dfuse-io/dgraphql", &zlog)
+	logging.Register("github.com/streamingfast/dgraphql", &zlog)
 }
 
 type graphqlLogger struct{}

@@ -26,8 +26,6 @@ import (
 
 	"github.com/dfuse-io/dauth/authenticator"
 	"github.com/dfuse-io/derr"
-	"github.com/dfuse-io/dgraphql/analytics"
-	"github.com/dfuse-io/dgraphql/insecure"
 	"github.com/dfuse-io/dgrpc"
 	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/jsonpb"
@@ -39,6 +37,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/errors"
+	"github.com/streamingfast/dgraphql/analytics"
+	"github.com/streamingfast/dgraphql/insecure"
 	"go.opencensus.io/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"

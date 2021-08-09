@@ -1,4 +1,4 @@
-module github.com/dfuse-io/dgraphql
+module github.com/streamingfast/dgraphql
 
 go 1.13
 

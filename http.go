@@ -26,11 +26,11 @@ import (
 	"github.com/dfuse-io/dmetering"
 
 	"github.com/dfuse-io/derr"
-	"github.com/dfuse-io/dgraphql/apollo"
-	"github.com/dfuse-io/dgraphql/static"
 	"github.com/dfuse-io/dipp"
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go/relay"
+	"github.com/streamingfast/dgraphql/apollo"
+	"github.com/streamingfast/dgraphql/static"
 	"go.uber.org/zap"
 )
 

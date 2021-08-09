@@ -23,13 +23,13 @@ import (
 	"time"
 
 	"github.com/dfuse-io/dauth/authenticator"
-	"github.com/dfuse-io/dgraphql/analytics"
 	"github.com/dfuse-io/dmetering"
 	"github.com/dfuse-io/dtracing"
 	"github.com/dfuse-io/logging"
 	"github.com/gorilla/websocket"
 	"github.com/graph-gophers/graphql-go"
 	gqerrors "github.com/graph-gophers/graphql-go/errors"
+	"github.com/streamingfast/dgraphql/analytics"
 	"go.uber.org/zap"
 )
 
