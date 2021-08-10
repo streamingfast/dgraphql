@@ -27,7 +27,7 @@ require (
 	github.com/streamingfast/dauth v0.0.0-20210809192433-4c758fd333ac
 	github.com/streamingfast/derr v0.0.0-20210810022442-32249850a4fb
 	github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843
-	github.com/streamingfast/dtracing v0.0.0-20210810035915-473055fed32a
+	github.com/streamingfast/dtracing v0.0.0-20210810040633-7c6259bea4a7
 	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.6.0
