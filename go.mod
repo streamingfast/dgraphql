@@ -7,7 +7,7 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.6
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/dfuse-io/bstream v0.0.2-0.20210810125844-72912424b968 // indirect
+	github.com/dfuse-io/bstream v0.0.2-0.20210810193659-788cf4d32e16 // indirect
 	github.com/dfuse-io/dgrpc v0.0.0-20210810125735-867cc255530c
 	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
 	github.com/dfuse-io/jsonpb v0.0.0-20200406211248-c5cf83f0e0c0
@@ -29,7 +29,7 @@ require (
 	github.com/streamingfast/dmetrics v0.0.0-20210810172555-564d623b116f
 	github.com/streamingfast/dtracing v0.0.0-20210810040633-7c6259bea4a7
 	github.com/streamingfast/shutter v1.5.0
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.5.0 // indirect
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.6.0
