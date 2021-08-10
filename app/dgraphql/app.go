@@ -22,7 +22,7 @@ import (
 
 	"github.com/streamingfast/derr"
 	"github.com/dfuse-io/dmetrics"
-	"github.com/dfuse-io/shutter"
+	"github.com/streamingfast/shutter"
 	dauthAuthenticator "github.com/streamingfast/dauth/authenticator"
 	"github.com/streamingfast/dgraphql"
 	"github.com/streamingfast/dgraphql/metrics"

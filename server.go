@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dfuse-io/shutter"
+	"github.com/streamingfast/shutter"
 	"github.com/streamingfast/dauth/authenticator"
 	dauthAuthenticator "github.com/streamingfast/dauth/authenticator"
 	_ "github.com/streamingfast/dauth/authenticator/null" // register plugin

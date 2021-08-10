@@ -30,7 +30,7 @@ import (
 	"github.com/dfuse-io/logging"
 	pbgraphql "github.com/dfuse-io/pbgo/dfuse/graphql/v1"
 	pbhealth "github.com/dfuse-io/pbgo/grpc/health/v1"
-	"github.com/dfuse-io/shutter"
+	"github.com/streamingfast/shutter"
 	pbstruct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go"

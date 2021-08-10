@@ -7,14 +7,14 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.6
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/dfuse-io/dgrpc v0.0.0-20200417124327-c8f215bc4ce5
+	github.com/dfuse-io/bstream v0.0.2-0.20210810125844-72912424b968 // indirect
+	github.com/dfuse-io/dgrpc v0.0.0-20210810125735-867cc255530c
 	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
 	github.com/dfuse-io/dmetrics v0.0.0-20200406214800-499fc7b320ab
 	github.com/dfuse-io/jsonpb v0.0.0-20200406211248-c5cf83f0e0c0
-	github.com/dfuse-io/logging v0.0.0-20201110202154-26697de88c79
+	github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70
 	github.com/dfuse-io/opaque v0.0.0-20210108174126-bc02ec905d48
-	github.com/dfuse-io/pbgo v0.0.6-0.20200602201455-99986ef5a09d
-	github.com/dfuse-io/shutter v1.4.1-0.20200407040739-f908f9ab727f
+	github.com/dfuse-io/pbgo v0.0.6-0.20210429181308-d54fc7723ad3
 	github.com/golang/protobuf v1.3.5
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.3
@@ -28,13 +28,15 @@ require (
 	github.com/streamingfast/derr v0.0.0-20210810022442-32249850a4fb
 	github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843
 	github.com/streamingfast/dtracing v0.0.0-20210810040633-7c6259bea4a7
+	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/stretchr/testify v1.5.1
+	github.com/tidwall/gjson v1.5.0 // indirect
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.6.0
-	go.uber.org/zap v1.14.1
+	go.uber.org/zap v1.15.0
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	google.golang.org/genproto v0.0.0-20200108215221-bd8f9a0ef82f // indirect
-	google.golang.org/grpc v1.26.0
+	google.golang.org/grpc v1.29.1
 	gotest.tools v2.2.0+incompatible
 )
 
