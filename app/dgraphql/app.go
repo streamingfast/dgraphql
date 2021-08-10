@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dfuse-io/derr"
+	"github.com/streamingfast/derr"
 	"github.com/dfuse-io/dmetrics"
 	"github.com/dfuse-io/shutter"
 	dauthAuthenticator "github.com/streamingfast/dauth/authenticator"

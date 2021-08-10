@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/dfuse-io/derr"
+	"github.com/streamingfast/derr"
 	"github.com/dfuse-io/dtracing"
 	"github.com/graph-gophers/graphql-go/errors"
 	"google.golang.org/grpc/codes"

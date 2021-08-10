@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dfuse-io/derr"
+	"github.com/streamingfast/derr"
 	"github.com/dfuse-io/dgrpc"
 	"github.com/dfuse-io/jsonpb"
 	"github.com/dfuse-io/logging"

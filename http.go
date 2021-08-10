@@ -25,7 +25,7 @@ import (
 	dauthMiddleware "github.com/streamingfast/dauth/authenticator/middleware"
 	"github.com/streamingfast/dmetering"
 
-	"github.com/dfuse-io/derr"
+	"github.com/streamingfast/derr"
 	"github.com/dfuse-io/dipp"
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go/relay"

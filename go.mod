@@ -7,7 +7,6 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.6
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/dfuse-io/derr v0.0.0-20200417132224-d333cfd0e9a0
 	github.com/dfuse-io/dgrpc v0.0.0-20200417124327-c8f215bc4ce5
 	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
 	github.com/dfuse-io/dmetrics v0.0.0-20200406214800-499fc7b320ab
@@ -27,6 +26,7 @@ require (
 	github.com/prometheus/client_golang v1.2.1 // indirect
 	github.com/prometheus/client_model v0.1.0 // indirect
 	github.com/streamingfast/dauth v0.0.0-20210809192433-4c758fd333ac
+	github.com/streamingfast/derr v0.0.0-20210810022442-32249850a4fb
 	github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843
 	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3
