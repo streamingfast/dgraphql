@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/streamingfast/derr"
-	"github.com/dfuse-io/dmetrics"
+	"github.com/streamingfast/dmetrics"
 	"github.com/streamingfast/shutter"
 	dauthAuthenticator "github.com/streamingfast/dauth/authenticator"
 	"github.com/streamingfast/dgraphql"

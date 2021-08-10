@@ -10,7 +10,6 @@ require (
 	github.com/dfuse-io/bstream v0.0.2-0.20210810125844-72912424b968 // indirect
 	github.com/dfuse-io/dgrpc v0.0.0-20210810125735-867cc255530c
 	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
-	github.com/dfuse-io/dmetrics v0.0.0-20200406214800-499fc7b320ab
 	github.com/dfuse-io/jsonpb v0.0.0-20200406211248-c5cf83f0e0c0
 	github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70
 	github.com/dfuse-io/opaque v0.0.0-20210108174126-bc02ec905d48
@@ -27,8 +26,9 @@ require (
 	github.com/streamingfast/dauth v0.0.0-20210809192433-4c758fd333ac
 	github.com/streamingfast/derr v0.0.0-20210810022442-32249850a4fb
 	github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843
+	github.com/streamingfast/dmetrics v0.0.0-20210810172555-564d623b116f
 	github.com/streamingfast/dtracing v0.0.0-20210810040633-7c6259bea4a7
-	github.com/streamingfast/shutter v1.5.0 // indirect
+	github.com/streamingfast/shutter v1.5.0
 	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.5.0 // indirect
 	go.opencensus.io v0.22.3

@@ -89,7 +89,6 @@ github.com/dfuse-io/dgrpc v0.0.0-20210810125735-867cc255530c/go.mod h1:WujQm/AlG
 github.com/dfuse-io/dhammer v0.0.0-20201127174908-667b90585063/go.mod h1:oZddPdIkulFkFWxsxyOY0cavd2+kSjpxLOYgtZAZeNE=
 github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4 h1:2y5Tbm8RPbhCSutKgJwa328F/bJ23rpWC8clt5LhCiA=
 github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4/go.mod h1:4OSkJC9kCEQMw9f79Kl4Dl2vQZxQLknn0W7hZlZLsPM=
-github.com/dfuse-io/dmetrics v0.0.0-20200406214800-499fc7b320ab h1:sgm+qkT4EM6q2App/t9h5FoPqsJ4Ooph5zw7BdBpbfU=
 github.com/dfuse-io/dmetrics v0.0.0-20200406214800-499fc7b320ab/go.mod h1:bTeE3yXvn/O8f0hw7wOstnUrKTCw9HDzC6aBtldPVRI=
 github.com/dfuse-io/dtracing v0.0.0-20200406213603-4b0c0063b125 h1:XvwJj/xDY0TQV1y1MvMBINLK/4RGrhuc2HmHscnRgdM=
 github.com/dfuse-io/dtracing v0.0.0-20200406213603-4b0c0063b125/go.mod h1:SA/v5q2RIuah2W5uvVldEUwfFprEhGiw66Id0j68rtw=
@@ -289,6 +288,10 @@ github.com/streamingfast/dmetering v0.0.0-20200529171737-525c3029795c h1:W7m94YJ
 github.com/streamingfast/dmetering v0.0.0-20200529171737-525c3029795c/go.mod h1:Qtr0qJsu5zfOJEKxNhp+hlTB785Psam/iAR2VbMa7uA=
 github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843 h1:2n/ex44O140RSBuMCshtCbq5grMyIVvayT7fS9nrrIU=
 github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843/go.mod h1:oZESKnHkWdCRng9ds6bELIZo+49dRIR2Z9VF4FRZYVo=
+github.com/streamingfast/dmetrics v0.0.0-20200406214800-499fc7b320ab h1:sgm+qkT4EM6q2App/t9h5FoPqsJ4Ooph5zw7BdBpbfU=
+github.com/streamingfast/dmetrics v0.0.0-20200406214800-499fc7b320ab/go.mod h1:bTeE3yXvn/O8f0hw7wOstnUrKTCw9HDzC6aBtldPVRI=
+github.com/streamingfast/dmetrics v0.0.0-20210810172555-564d623b116f h1:IsQnH57dfiyfExvwm8uiQFpQnKS/jLGNQWjXhpYN93U=
+github.com/streamingfast/dmetrics v0.0.0-20210810172555-564d623b116f/go.mod h1:PTx7xvHKWacl8ojqV7uIuXqPlpHzpTtyoygIHBEUTDY=
 github.com/streamingfast/dstore v0.1.1-0.20210810110932-928f221474e4 h1:zDzSLuihOSd2nmV4zGeYUcCL7zTqK+4zhbwowaKTL9o=
 github.com/streamingfast/dstore v0.1.1-0.20210810110932-928f221474e4/go.mod h1:RZSfjj0Odw2Apdm1VsNLIpTC2Ure3sh9Jtpt+Ks8Zuc=
 github.com/streamingfast/dtracing v0.0.0-20200406213603-4b0c0063b125 h1:XvwJj/xDY0TQV1y1MvMBINLK/4RGrhuc2HmHscnRgdM=
