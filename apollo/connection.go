@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dfuse-io/dtracing"
+	"github.com/streamingfast/dtracing"
 	"github.com/dfuse-io/logging"
 	"github.com/gorilla/websocket"
 	"github.com/graph-gophers/graphql-go"

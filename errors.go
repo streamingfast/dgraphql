@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"github.com/streamingfast/derr"
-	"github.com/dfuse-io/dtracing"
+	"github.com/streamingfast/dtracing"
 	"github.com/graph-gophers/graphql-go/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

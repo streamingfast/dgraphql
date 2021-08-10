@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dfuse-io/dtracing"
+	"github.com/streamingfast/dtracing"
 	"github.com/gorilla/websocket"
 	dauth "github.com/streamingfast/dauth/authenticator"
 	"go.uber.org/zap"

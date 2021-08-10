@@ -10,7 +10,6 @@ require (
 	github.com/dfuse-io/dgrpc v0.0.0-20200417124327-c8f215bc4ce5
 	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
 	github.com/dfuse-io/dmetrics v0.0.0-20200406214800-499fc7b320ab
-	github.com/dfuse-io/dtracing v0.0.0-20200406213603-4b0c0063b125
 	github.com/dfuse-io/jsonpb v0.0.0-20200406211248-c5cf83f0e0c0
 	github.com/dfuse-io/logging v0.0.0-20201110202154-26697de88c79
 	github.com/dfuse-io/opaque v0.0.0-20210108174126-bc02ec905d48
@@ -28,6 +27,7 @@ require (
 	github.com/streamingfast/dauth v0.0.0-20210809192433-4c758fd333ac
 	github.com/streamingfast/derr v0.0.0-20210810022442-32249850a4fb
 	github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843
+	github.com/streamingfast/dtracing v0.0.0-20210810035915-473055fed32a
 	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.6.0

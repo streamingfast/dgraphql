@@ -21,7 +21,7 @@ import (
 	"net/http"
 
 	pbsearch "github.com/dfuse-io/pbgo/dfuse/search/v1"
-	"github.com/dfuse-io/dtracing"
+	"github.com/streamingfast/dtracing"
 	"github.com/dfuse-io/logging"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
