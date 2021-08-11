@@ -26,7 +26,7 @@ import (
 	"github.com/streamingfast/dmetering"
 
 	"github.com/streamingfast/derr"
-	"github.com/dfuse-io/dipp"
+	"github.com/streamingfast/dipp"
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go/relay"
 	"github.com/streamingfast/dgraphql/apollo"

@@ -6,7 +6,6 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.8
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.3
@@ -17,6 +16,7 @@ require (
 	github.com/streamingfast/dauth v0.0.0-20210811181149-e8fd545948cc
 	github.com/streamingfast/derr v0.0.0-20210811180100-9138d738bcec
 	github.com/streamingfast/dgrpc v0.0.0-20210811180351-8646818518b2
+	github.com/streamingfast/dipp v1.0.1-0.20210811200841-d2cca4e058e6 // indirect
 	github.com/streamingfast/dmetering v0.0.0-20210811181351-eef120cfb817
 	github.com/streamingfast/dmetrics v0.0.0-20210811180524-8494aeb34447
 	github.com/streamingfast/dtracing v0.0.0-20210811175635-d55665d3622a
