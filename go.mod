@@ -8,7 +8,6 @@ require (
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/dfuse-io/bstream v0.0.2-0.20210810193659-788cf4d32e16 // indirect
-	github.com/dfuse-io/dgrpc v0.0.0-20210810125735-867cc255530c
 	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
 	github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70
 	github.com/dfuse-io/pbgo v0.0.6-0.20210429181308-d54fc7723ad3
@@ -23,6 +22,7 @@ require (
 	github.com/prometheus/client_model v0.1.0 // indirect
 	github.com/streamingfast/dauth v0.0.0-20210809192433-4c758fd333ac
 	github.com/streamingfast/derr v0.0.0-20210810022442-32249850a4fb
+	github.com/streamingfast/dgrpc v0.0.0-20210810185305-905172f728e8 // indirect
 	github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843
 	github.com/streamingfast/dmetrics v0.0.0-20210810172555-564d623b116f
 	github.com/streamingfast/dtracing v0.0.0-20210810040633-7c6259bea4a7

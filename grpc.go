@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/streamingfast/derr"
-	"github.com/dfuse-io/dgrpc"
+	"github.com/streamingfast/dgrpc"
 	"github.com/streamingfast/jsonpb"
 	"github.com/dfuse-io/logging"
 	pbgraphql "github.com/dfuse-io/pbgo/dfuse/graphql/v1"
