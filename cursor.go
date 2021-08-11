@@ -18,7 +18,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/dfuse-io/opaque"
+	"github.com/streamingfast/opaque"
 	"github.com/golang/protobuf/proto"
 )
 
