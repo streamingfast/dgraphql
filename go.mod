@@ -7,7 +7,6 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.6
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/dfuse-io/bstream v0.0.2-0.20210810193659-788cf4d32e16 // indirect
 	github.com/dfuse-io/dipp v1.0.1-0.20200407033930-5c17c531c3c4
 	github.com/dfuse-io/logging v0.0.0-20210109005628-b97a57253f70
 	github.com/dfuse-io/pbgo v0.0.6-0.20210429181308-d54fc7723ad3
@@ -22,15 +21,14 @@ require (
 	github.com/prometheus/client_model v0.1.0 // indirect
 	github.com/streamingfast/dauth v0.0.0-20210809192433-4c758fd333ac
 	github.com/streamingfast/derr v0.0.0-20210810022442-32249850a4fb
-	github.com/streamingfast/dgrpc v0.0.0-20210810185305-905172f728e8 // indirect
+	github.com/streamingfast/dgrpc v0.0.0-20210810185305-905172f728e8
 	github.com/streamingfast/dmetering v0.0.0-20210809193048-81d008c90843
 	github.com/streamingfast/dmetrics v0.0.0-20210810172555-564d623b116f
 	github.com/streamingfast/dtracing v0.0.0-20210810040633-7c6259bea4a7
-	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0 // indirect
-	github.com/streamingfast/opaque v0.0.0-20210809210154-b964592beb5d // indirect
+	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
+	github.com/streamingfast/opaque v0.0.0-20210809210154-b964592beb5d
 	github.com/streamingfast/shutter v1.5.0
 	github.com/stretchr/testify v1.7.0
-	github.com/tidwall/gjson v1.5.0 // indirect
 	go.opencensus.io v0.22.3
 	go.uber.org/atomic v1.6.0
 	go.uber.org/zap v1.15.0
