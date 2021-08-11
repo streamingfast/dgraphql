@@ -27,7 +27,7 @@ import (
 	"github.com/streamingfast/derr"
 	"github.com/streamingfast/dgrpc"
 	"github.com/streamingfast/jsonpb"
-	"github.com/dfuse-io/logging"
+	"github.com/streamingfast/logging"
 	pbgraphql "github.com/streamingfast/pbgo/dfuse/graphql/v1"
 	pbhealth "github.com/streamingfast/pbgo/grpc/health/v1"
 	"github.com/streamingfast/shutter"

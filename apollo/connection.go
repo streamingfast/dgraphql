@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/streamingfast/dtracing"
-	"github.com/dfuse-io/logging"
+	"github.com/streamingfast/logging"
 	"github.com/gorilla/websocket"
 	"github.com/graph-gophers/graphql-go"
 	gqerrors "github.com/graph-gophers/graphql-go/errors"
