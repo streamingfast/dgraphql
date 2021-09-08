@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	pbstruct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go"
@@ -33,6 +34,7 @@ import (
 	"github.com/streamingfast/dgraphql/analytics"
 	"github.com/streamingfast/dgraphql/insecure"
 	"github.com/streamingfast/dgrpc"
+	"github.com/streamingfast/dmetering"
 	"github.com/streamingfast/jsonpb"
 	"github.com/streamingfast/logging"
 	pbgraphql "github.com/streamingfast/pbgo/dfuse/graphql/v1"
@@ -203,12 +205,12 @@ func (s *EndpointServer) Execute(req *pbgraphql.Request, stream pbgraphql.GraphQ
 	// Billable event on GraphQL Subscriptions
 	// WARNING : Here we only track Ingress bytes
 	//////////////////////////////////////////////////////////////////////
-	//dmetering.EmitWithContext(dmetering.Event{
-	//	Source:       "dgraphql",
-	//	Kind:         "GraphQL Subscription",
-	//	Method:       "", //TODO For now we will need by able to aggregate Ingress / Egress per method
-	//	IngressBytes: int64(req.XXX_Size()),
-	//}, ctx)
+	dmetering.EmitWithContext(dmetering.Event{
+		Source:       "dgraphql",
+		Kind:         "GraphQL Subscription",
+		Method:       "", //TODO For now we will need by able to aggregate Ingress / Egress per method
+		IngressBytes: int64(proto.Size(req)),
+	}, ctx)
 	//////////////////////////////////////////////////////////////////////
 
 	vars := decodeToMap(req.Variables)
@@ -256,12 +258,12 @@ func (s *EndpointServer) Execute(req *pbgraphql.Request, stream pbgraphql.GraphQ
 			// Billable event on GraphQL Subscriptions
 			// WARNING : Here we only track Egress bytes
 			//////////////////////////////////////////////////////////////////////
-			//dmetering.EmitWithContext(dmetering.Event{
-			//	Source:      "dgraphql",
-			//	Kind:        "GraphQL Subscription",
-			//	Method:      "", //TODO For now we will need by able to aggregate Ingress / Egress per method
-			//	EgressBytes: int64(rpcResp.XXX_Size()),
-			//}, ctx)
+			dmetering.EmitWithContext(dmetering.Event{
+				Source:      "dgraphql",
+				Kind:        "GraphQL Subscription",
+				Method:      "", //TODO For now we will need by able to aggregate Ingress / Egress per method
+				EgressBytes: int64(proto.Size(rpcResp)),
+			}, ctx)
 			//////////////////////////////////////////////////////////////////////
 
 			if err := stream.Send(rpcResp); err != nil {
