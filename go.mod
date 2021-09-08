@@ -21,7 +21,7 @@ require (
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20210811175431-f3b44b61606a
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308
-	github.com/streamingfast/pbgo v0.0.6-0.20210811160400-7c146c2db8cc
+	github.com/streamingfast/pbgo v0.0.6-0.20210820205306-ba5335146052
 	github.com/streamingfast/shutter v1.5.0
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.23.0
