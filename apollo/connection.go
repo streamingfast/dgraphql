@@ -22,14 +22,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/streamingfast/dtracing"
-	"github.com/streamingfast/logging"
 	"github.com/gorilla/websocket"
 	"github.com/graph-gophers/graphql-go"
 	gqerrors "github.com/graph-gophers/graphql-go/errors"
 	"github.com/streamingfast/dauth/authenticator"
 	"github.com/streamingfast/dgraphql/analytics"
 	"github.com/streamingfast/dmetering"
+	"github.com/streamingfast/dtracing"
+	"github.com/streamingfast/logging"
 	"go.uber.org/zap"
 )
 
@@ -156,6 +156,7 @@ func (conn *connection) writeLoop(ctx context.Context) sendFunc {
 		defer close(stop)
 		defer conn.close()
 
+		first := true
 		for {
 			select {
 			case <-ctx.Done():
@@ -167,7 +168,10 @@ func (conn *connection) writeLoop(ctx context.Context) sendFunc {
 				default:
 				}
 
-				conn.logger.Debug("setting connection timeout value", zap.Duration("write_timeout", conn.writeTimeout))
+				if first {
+					conn.logger.Debug("setting connection timeout value", zap.Duration("write_timeout", conn.writeTimeout))
+				}
+
 				if err := conn.ws.SetWriteDeadline(time.Now().Add(conn.writeTimeout)); err != nil {
 					return
 				}
@@ -188,6 +192,8 @@ func (conn *connection) writeLoop(ctx context.Context) sendFunc {
 				}, conn.credentials)
 				//////////////////////////////////////////////////////////////////////
 			}
+
+			first = false
 		}
 	}()
 
