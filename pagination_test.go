@@ -17,9 +17,9 @@ package dgraphql
 import (
 	"testing"
 
-	pbgraphql "github.com/streamingfast/pbgo/dfuse/graphql/v1"
 	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/dgraphql/types"
+	pbgraphql "github.com/streamingfast/pbgo/sf/graphql/v1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
