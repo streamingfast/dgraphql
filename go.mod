@@ -12,12 +12,12 @@ require (
 	github.com/graph-gophers/graphql-go v0.0.0-20191115155744-f33e81362277
 	github.com/pkg/errors v0.9.1
 	github.com/streamingfast/dauth v0.0.0-20210811181149-e8fd545948cc
-	github.com/streamingfast/derr v0.0.0-20210811180100-9138d738bcec
+	github.com/streamingfast/derr v0.0.0-20220301163149-de09cb18fc70
 	github.com/streamingfast/dgrpc v0.0.0-20220301153539-536adf71b594
 	github.com/streamingfast/dipp v1.0.1-0.20210811200841-d2cca4e058e6
 	github.com/streamingfast/dmetering v0.0.0-20210811181351-eef120cfb817
 	github.com/streamingfast/dmetrics v0.0.0-20210811180524-8494aeb34447
-	github.com/streamingfast/dtracing v0.0.0-20210811175635-d55665d3622a
+	github.com/streamingfast/dtracing v0.0.0-20220301163030-15ce3f71dd1c
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20220222131651-12c3943aac2e
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308
