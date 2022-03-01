@@ -11,11 +11,11 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/graph-gophers/graphql-go v0.0.0-20191115155744-f33e81362277
 	github.com/pkg/errors v0.9.1
-	github.com/streamingfast/dauth v0.0.0-20210811181149-e8fd545948cc
+	github.com/streamingfast/dauth v0.0.0-20210812020920-1c83ba29add1
 	github.com/streamingfast/derr v0.0.0-20220301163149-de09cb18fc70
 	github.com/streamingfast/dgrpc v0.0.0-20220301153539-536adf71b594
 	github.com/streamingfast/dipp v1.0.1-0.20210811200841-d2cca4e058e6
-	github.com/streamingfast/dmetering v0.0.0-20210811181351-eef120cfb817
+	github.com/streamingfast/dmetering v0.0.0-20220301165106-a642bb6a21bd
 	github.com/streamingfast/dmetrics v0.0.0-20210811180524-8494aeb34447
 	github.com/streamingfast/dtracing v0.0.0-20220301163030-15ce3f71dd1c
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
