@@ -37,13 +37,13 @@ import (
 	"github.com/streamingfast/dmetering"
 	"github.com/streamingfast/jsonpb"
 	"github.com/streamingfast/logging"
-	pbhealth "github.com/streamingfast/pbgo/grpc/health/v1"
 	pbgraphql "github.com/streamingfast/pbgo/sf/graphql/v1"
 	"github.com/streamingfast/shutter"
 	"go.opencensus.io/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	pbhealth "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -378,14 +378,42 @@ func maybeRewriteLegacyPaths(urlPath string) string {
 	return urlPath
 }
 
-// FIXME: healthcheck will be included in dgrpc NewServer2
 type healthGRPCHandler struct{}
 
-func (c healthGRPCHandler) Check(ctx context.Context, _ *pbhealth.HealthCheckRequest) (*pbhealth.HealthCheckResponse, error) {
+func (b healthGRPCHandler) Check(ctx context.Context, in *pbhealth.HealthCheckRequest) (*pbhealth.HealthCheckResponse, error) {
+	return &pbhealth.HealthCheckResponse{
+		Status: b.healthStatus(),
+	}, nil
+}
+
+func (b healthGRPCHandler) Watch(req *pbhealth.HealthCheckRequest, stream pbhealth.Health_WatchServer) error {
+	currentStatus := pbhealth.HealthCheckResponse_SERVICE_UNKNOWN
+	waitTime := 0 * time.Second
+
+	for {
+		select {
+		case <-stream.Context().Done():
+			return nil
+		case <-time.After(waitTime):
+			newStatus := b.healthStatus()
+			waitTime = 5 * time.Second
+
+			if newStatus != currentStatus {
+				currentStatus = newStatus
+
+				if err := stream.Send(&pbhealth.HealthCheckResponse{Status: currentStatus}); err != nil {
+					return err
+				}
+			}
+		}
+	}
+}
+
+func (b healthGRPCHandler) healthStatus() pbhealth.HealthCheckResponse_ServingStatus {
 	status := pbhealth.HealthCheckResponse_SERVING
 	if derr.IsShuttingDown() {
 		status = pbhealth.HealthCheckResponse_NOT_SERVING
 	}
 
-	return &pbhealth.HealthCheckResponse{Status: status}, nil
+	return status
 }
