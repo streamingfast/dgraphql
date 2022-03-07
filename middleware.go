@@ -21,11 +21,11 @@ import (
 	"net/http"
 
 	stackdriverPropagation "contrib.go.opencensus.io/exporter/stackdriver/propagation"
-	"github.com/streamingfast/logging"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/graph-gophers/graphql-go"
 	gerrors "github.com/graph-gophers/graphql-go/errors"
+	"github.com/streamingfast/dtracing"
 )
 
 func CompressionMiddleware(next http.Handler) http.Handler {
@@ -33,11 +33,7 @@ func CompressionMiddleware(next http.Handler) http.Handler {
 }
 
 func LoggingMiddleware(next http.Handler) http.Handler {
-	return &logging.Handler{
-		Next:        next,
-		Propagation: &stackdriverPropagation.HTTPFormat{},
-		RootLogger:  zlog,
-	}
+	return dtracing.NewAddTraceIDAwareLoggerMiddleware(next, zlog, &stackdriverPropagation.HTTPFormat{})
 }
 
 func NewCORSMiddleware() mux.MiddlewareFunc {

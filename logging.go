@@ -18,17 +18,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/streamingfast/logging"
 	"github.com/pkg/errors"
+	"github.com/streamingfast/logging"
 	"go.uber.org/zap"
 )
 
-var traceEnabled = logging.IsTraceEnabled("dgraphql", "github.com/streamingfast/dgraphql")
-var zlog *zap.Logger
-
-func init() {
-	logging.Register("github.com/streamingfast/dgraphql", &zlog)
-}
+var zlog, tracer = logging.PackageLogger("dgraphql", "github.com/streamingfast/dgraphql")
 
 type graphqlLogger struct{}
 

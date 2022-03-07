@@ -3,7 +3,7 @@ module github.com/streamingfast/dgraphql
 go 1.13
 
 require (
-	contrib.go.opencensus.io/exporter/stackdriver v0.13.8
+	contrib.go.opencensus.io/exporter/stackdriver v0.13.10
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/handlers v1.4.2
@@ -17,9 +17,9 @@ require (
 	github.com/streamingfast/dipp v1.0.1-0.20210811200841-d2cca4e058e6
 	github.com/streamingfast/dmetering v0.0.0-20220301165106-a642bb6a21bd
 	github.com/streamingfast/dmetrics v0.0.0-20210811180524-8494aeb34447
-	github.com/streamingfast/dtracing v0.0.0-20220301163030-15ce3f71dd1c
+	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
-	github.com/streamingfast/logging v0.0.0-20220222131651-12c3943aac2e
+	github.com/streamingfast/logging v0.0.0-20220304214715-bc750a74b424
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308
 	github.com/streamingfast/pbgo v0.0.6-0.20220228185940-1bbaafec7d8a
 	github.com/streamingfast/shutter v1.5.0
@@ -27,7 +27,6 @@ require (
 	go.opencensus.io v0.23.0
 	go.uber.org/atomic v1.9.0
 	go.uber.org/zap v1.21.0
-	google.golang.org/api v0.53.0 // indirect
 	google.golang.org/grpc v1.44.0
 	gotest.tools v2.2.0+incompatible
 )

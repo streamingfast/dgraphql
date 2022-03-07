@@ -181,7 +181,7 @@ func MergeSchemas(first string, second string) string {
 		typeName := full[match[2]:match[3]]
 		section := full[match[4]:match[5]]
 
-		if traceEnabled {
+		if tracer.Enabled() {
 			zlog.Debug("schema section", zap.String("value", value), zap.String("type", typeName), zap.String("section", section))
 		}
 
